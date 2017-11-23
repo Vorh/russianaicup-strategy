@@ -1,8 +1,9 @@
+import control.ChainCommand;
 import model.*;
+import model_custom.Info;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public final class MyStrategy implements Strategy {
 
@@ -12,19 +13,19 @@ public final class MyStrategy implements Strategy {
     static {
         preferredTargetTypesByVehicleType = new EnumMap<>(VehicleType.class);
 
-        preferredTargetTypesByVehicleType.put(VehicleType.FIGHTER, new VehicleType[] {
+        preferredTargetTypesByVehicleType.put(VehicleType.FIGHTER, new VehicleType[]{
                 VehicleType.HELICOPTER, VehicleType.FIGHTER
         });
 
-        preferredTargetTypesByVehicleType.put(VehicleType.HELICOPTER, new VehicleType[] {
+        preferredTargetTypesByVehicleType.put(VehicleType.HELICOPTER, new VehicleType[]{
                 VehicleType.TANK, VehicleType.ARRV, VehicleType.HELICOPTER, VehicleType.IFV, VehicleType.FIGHTER
         });
 
-        preferredTargetTypesByVehicleType.put(VehicleType.IFV, new VehicleType[] {
+        preferredTargetTypesByVehicleType.put(VehicleType.IFV, new VehicleType[]{
                 VehicleType.HELICOPTER, VehicleType.ARRV, VehicleType.IFV, VehicleType.FIGHTER, VehicleType.TANK
         });
 
-        preferredTargetTypesByVehicleType.put(VehicleType.TANK, new VehicleType[] {
+        preferredTargetTypesByVehicleType.put(VehicleType.TANK, new VehicleType[]{
                 VehicleType.IFV, VehicleType.ARRV, VehicleType.TANK, VehicleType.FIGHTER, VehicleType.HELICOPTER
         });
     }
@@ -37,11 +38,19 @@ public final class MyStrategy implements Strategy {
     private Player me;
     private World world;
     private Game game;
-    private Move move;
+    private Move moveMain;
+    private boolean isCreateFormation;
 
     private final Map<Long, Vehicle> vehicleById = new HashMap<>();
     private final Map<Long, Integer> updateTickByVehicleId = new HashMap<>();
     private final Queue<Consumer<Move>> delayedMoves = new ArrayDeque<>();
+    private final Map<Integer, ChainCommand> commandMap = new HashMap<>();
+    protected final Info info;
+
+
+    public MyStrategy() {
+        info = new Info();
+    }
 
     /**
      * Основной метод стратегии, осуществляющий управление армией. Вызывается каждый тик.
@@ -55,6 +64,10 @@ public final class MyStrategy implements Strategy {
     public void move(Player me, World world, Game game, Move move) {
         initializeStrategy(world, game);
         initializeTick(me, world, game, move);
+
+        if (!isCreateFormation) {
+            createFormation();
+        }
 
         if (me.getRemainingActionCooldownTicks() > 0) {
             return;
@@ -92,7 +105,8 @@ public final class MyStrategy implements Strategy {
         this.me = me;
         this.world = world;
         this.game = game;
-        this.move = move;
+        this.moveMain = move;
+
 
         for (Vehicle vehicle : world.getNewVehicles()) {
             vehicleById.put(vehicle.getId(), vehicle);
@@ -110,6 +124,9 @@ public final class MyStrategy implements Strategy {
                 updateTickByVehicleId.put(vehicleId, world.getTickIndex());
             }
         }
+
+        info.init(game, me, move, world, vehicleById);
+
     }
 
     /**
@@ -123,97 +140,55 @@ public final class MyStrategy implements Strategy {
             return false;
         }
 
-        delayedMove.accept(move);
+        delayedMove.accept(moveMain);
         return true;
     }
+
+
+    private void createFormation() {
+
+        double x = info.getX(VehicleType.FIGHTER);
+        double y = info.getY(VehicleType.FIGHTER);
+
+        command().select(VehicleType.FIGHTER)
+                .move(x, 2D, y, 2D)
+                .then((oldInfo, newInfo) -> {
+
+                    double oldX = oldInfo.getX(VehicleType.FIGHTER);
+                    double oldY = oldInfo.getY(VehicleType.FIGHTER);
+
+                    double currentX = newInfo.getX(VehicleType.FIGHTER);
+                    double currentY = newInfo.getY(VehicleType.FIGHTER);
+
+                    if (currentX == oldX && currentY == oldY) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                })
+                .scale(1.1D);
+
+
+    }
+
+
+    public ChainCommand command() {
+        ChainCommand chainCommand = new ChainCommand(info);
+        return chainCommand;
+    }
+
 
     /**
      * Основная логика нашей стратегии.
      */
     private void move() {
+        commandMap.entrySet().removeIf(entry -> {
+            ChainCommand command = entry.getValue();
 
-
-
-        double x = streamVehicles(Ownership.ENEMY, VehicleType.FIGHTER).mapToDouble(Vehicle::getX).average().orElse(Double.NaN);
-        double y = streamVehicles(Ownership.ENEMY, VehicleType.FIGHTER).mapToDouble(Vehicle::getY).average().orElse(Double.NaN);
-
-        delayedMoves.add(move->{
-            move.setAction(ActionType.CLEAR_AND_SELECT);
-            move.setRight(world.getWidth());
-            move.setBottom(world.getHeight());
-            move.setVehicleType(VehicleType.FIGHTER);
+            return command.execute();
         });
-
-        delayedMoves.add(move->{
-            move.setAction(ActionType.MOVE);
-            move.setX(world.getHeight()-x);
-            move.setY(world.getWidth()-y);
-        });
-
-
-
-//        for (VehicleType vehicleType : VehicleType.values()) {
-//
-//            double x = streamVehicles(Ownership.ALLY, vehicleType).mapToDouble(Vehicle::getX).average().orElse(Double.NaN);
-//            double y = streamVehicles(Ownership.ALLY, vehicleType).mapToDouble(Vehicle::getY).average().orElse(Double.NaN);
-//
-//
-//            double targetX = world.getWidth();
-//            double targetY = 0;
-//
-//
-//
-//            if (!Double.isNaN(x) && !Double.isNaN(y)) {
-//                delayedMoves.add(move -> {
-//                    move.setAction(ActionType.CLEAR_AND_SELECT);
-//                    move.setRight(world.getWidth());
-//                    move.setBottom(world.getHeight());
-//                    move.setVehicleType(vehicleType);
-//                });
-//
-//                delayedMoves.add(move -> {
-//                    move.setAction(ActionType.MOVE);
-//                    move.setX(targetX - x);
-//                    move.setY(targetY - y);
-//                });
-//            }
-//        }
-
     }
 
-    private Stream<Vehicle> streamVehicles(Ownership ownership, VehicleType vehicleType) {
-        Stream<Vehicle> stream = vehicleById.values().stream();
 
-        switch (ownership) {
-            case ALLY:
-                stream = stream.filter(vehicle -> vehicle.getPlayerId() == me.getId());
-                break;
-            case ENEMY:
-                stream = stream.filter(vehicle -> vehicle.getPlayerId() != me.getId());
-                break;
-            default:
-        }
-
-        if (vehicleType != null) {
-            stream = stream.filter(vehicle -> vehicle.getType() == vehicleType);
-        }
-
-        return stream;
-    }
-
-    private Stream<Vehicle> streamVehicles(Ownership ownership) {
-        return streamVehicles(ownership, null);
-    }
-
-    private Stream<Vehicle> streamVehicles() {
-        return streamVehicles(Ownership.ANY);
-    }
-
-    private enum Ownership {
-        ANY,
-
-        ALLY,
-
-        ENEMY
-    }
 }
