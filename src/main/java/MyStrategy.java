@@ -46,10 +46,13 @@ public final class MyStrategy implements Strategy {
     private final Queue<Consumer<Move>> delayedMoves = new ArrayDeque<>();
     private final Map<Integer, ChainCommand> commandMap = new HashMap<>();
     protected final Info info;
+    protected final ChainCommand chainCommand;
 
 
     public MyStrategy() {
         info = new Info();
+        chainCommand = new ChainCommand(info,delayedMoves);
+
     }
 
     /**
@@ -174,7 +177,6 @@ public final class MyStrategy implements Strategy {
 
 
     public ChainCommand command() {
-        ChainCommand chainCommand = new ChainCommand(info);
         return chainCommand;
     }
 
@@ -185,7 +187,6 @@ public final class MyStrategy implements Strategy {
     private void move() {
         commandMap.entrySet().removeIf(entry -> {
             ChainCommand command = entry.getValue();
-
             return command.execute();
         });
     }
