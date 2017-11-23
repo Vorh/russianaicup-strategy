@@ -2,7 +2,7 @@
 
 
 
-cd ~/IdeaProjects/java-cgdk/local-runner-ru/
+cd ~/local-runner-ru/
 sh local-runner.sh
 
 #cd ..
