@@ -18,6 +18,7 @@ public class Command {
     private Consumer<Move> move;
     private Info oldInfo;
     private Info newInfo;
+    private VehicleType type;
     private int sleep;
 
     public Command(Info oldInfo, Info newInfo) {
@@ -42,14 +43,22 @@ public class Command {
     }
 
     public Command move(double x , double targetX, double y, double targetY){
+
+        double futureX = x+targetX;
+        double futureY = y+targetY;
         move = move->{
             move.setAction(ActionType.MOVE);
-            move.setX(x+targetX);
-            move.setX(y+targetY);
+            move.setX(futureX);
+            move.setY(futureY);
             System.out.println("MOVE " + targetX + " " + targetY);
         };
 
-        return createCommand();
+        Condition cont = (oldInfo1, newInfo1) -> {
+            System.out.println(newInfo.getDistanceTo(futureX,futureY,type));
+          return   newInfo.getDistanceTo(futureX,futureY,type) == 0;
+        };
+
+        return createCommand(cont);
     }
 
 
@@ -62,6 +71,8 @@ public class Command {
             move.setVehicleType(type);
         };
 
+        this.type = type;
+
         return createCommand();
     }
 
@@ -73,8 +84,14 @@ public class Command {
         return select(x,y,null);
     }
 
+    private Command createCommand(Condition condition){
+        Command command = createCommand();
+        command.condition = condition;
+        return command;
+    }
     private Command createCommand(){
         nextCommand = new Command(oldInfo,newInfo);
+        nextCommand.setType(type);
         return nextCommand;
     }
 
@@ -104,5 +121,9 @@ public class Command {
     public Command sleep(int countTick) {
         sleep = countTick;
         return createCommand();
+    }
+
+    public void setType(VehicleType type) {
+        this.type = type;
     }
 }

@@ -32,6 +32,10 @@ public class Info {
         return streamVehicles(Ownership.ALLY, type).mapToDouble(Vehicle::getY).average().orElse(Double.NaN);
     }
 
+    public double getDistanceTo(double x , double y,VehicleType type){
+        return streamVehicles(Ownership.ALLY,type).mapToDouble(vehicle -> vehicle.getDistanceTo(x, y)).average().orElse(Double.NaN);
+    }
+
     public Player getMe() {
         return me;
     }

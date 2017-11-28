@@ -62,7 +62,6 @@ public final class MyStrategy implements Strategy {
     @Override
     public void move(Player me, World world, Game game, Move move) {
 
-        System.out.println("TICK " + ticks);
 
         initializeStrategy(world, game);
         initializeTick(me, world, game, move);
@@ -161,24 +160,6 @@ public final class MyStrategy implements Strategy {
 
         command().select(VehicleType.FIGHTER)
                 .move(x, 2D, y, 2D)
-                .sleep(5)
-                .then((oldInfo, newInfo) -> {
-
-                    System.out.println("Check ");
-                    double oldX = oldInfo.getX(VehicleType.FIGHTER);
-                    double oldY = oldInfo.getY(VehicleType.FIGHTER);
-
-                    double currentX = newInfo.getX(VehicleType.FIGHTER);
-                    double currentY = newInfo.getY(VehicleType.FIGHTER);
-
-                    if (currentX == oldX && currentY == oldY) {
-                        System.out.println("SUCCUSS");
-                        return true;
-                    } else {
-                        return false;
-                    }
-
-                })
                 .scale(1.1D);
 
 
