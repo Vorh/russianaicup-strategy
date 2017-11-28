@@ -11,28 +11,12 @@ import java.util.stream.Stream;
 public class Info {
 
     private Player me;
-    public World world;
+    private World world;
     private Game game;
     private Move moveMain;
     private Map<Long, Vehicle> vehicleById;
 
-
-    private Player oldMe;
-    private World oldworld;
-    private Game oldGame;
-    private Move oldMoveMain;
-    private Map<Long, Vehicle> oldVehicleById;
-
-
-
-
     public void init(Game game, Player me, Move move, World world,Map<Long,Vehicle> vehicleById) {
-        oldMe = me;
-        oldworld = world;
-        oldGame = game;
-        oldMoveMain = moveMain;
-        oldVehicleById= this.vehicleById;
-
         this.me = me;
         this.world =  world;
         this.game = game;
@@ -48,6 +32,21 @@ public class Info {
         return streamVehicles(Ownership.ALLY, type).mapToDouble(Vehicle::getY).average().orElse(Double.NaN);
     }
 
+    public Player getMe() {
+        return me;
+    }
+
+    public World getWorld() {
+        return world;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public Move getMoveMain() {
+        return moveMain;
+    }
 
     public Stream<Vehicle> streamVehicles(Ownership ownership, VehicleType vehicleType) {
         Stream<Vehicle> stream = vehicleById.values().stream();

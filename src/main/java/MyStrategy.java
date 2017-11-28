@@ -1,4 +1,5 @@
 import control.ChainCommand;
+import control.Command;
 import model.*;
 import model_custom.Info;
 
@@ -30,6 +31,7 @@ public final class MyStrategy implements Strategy {
         });
     }
 
+
     private Random random;
 
     private TerrainType[][] terrainTypeByCellXY;
@@ -38,38 +40,36 @@ public final class MyStrategy implements Strategy {
     private Player me;
     private World world;
     private Game game;
-    private Move moveMain;
+    private Move move;
     private boolean isCreateFormation;
 
     private final Map<Long, Vehicle> vehicleById = new HashMap<>();
     private final Map<Long, Integer> updateTickByVehicleId = new HashMap<>();
     private final Queue<Consumer<Move>> delayedMoves = new ArrayDeque<>();
     private final Map<Integer, ChainCommand> commandMap = new HashMap<>();
-    protected final Info info;
-    protected final ChainCommand chainCommand;
+    protected final Info oldInfo;
+    protected final Info newInfo;
+    private int ticks;
 
 
     public MyStrategy() {
-        info = new Info();
-        chainCommand = new ChainCommand(info,delayedMoves);
-
+        oldInfo = new Info();
+        newInfo = new Info();
+        ticks = 20_000;
     }
 
-    /**
-     * Основной метод стратегии, осуществляющий управление армией. Вызывается каждый тик.
-     *
-     * @param me    Информация о вашем игроке.
-     * @param world Текущее состояние мира.
-     * @param game  Различные игровые константы.
-     * @param move  Результатом работы метода является изменение полей данного объекта.
-     */
+
     @Override
     public void move(Player me, World world, Game game, Move move) {
+
+        System.out.println("TICK " + ticks);
+
         initializeStrategy(world, game);
         initializeTick(me, world, game, move);
 
         if (!isCreateFormation) {
             createFormation();
+            isCreateFormation = true;
         }
 
         if (me.getRemainingActionCooldownTicks() > 0) {
@@ -83,6 +83,8 @@ public final class MyStrategy implements Strategy {
         move();
 
         executeDelayedMove();
+
+        ticks--;
     }
 
     /**
@@ -105,10 +107,14 @@ public final class MyStrategy implements Strategy {
      * технике и времени последнего изменения её состояния.
      */
     private void initializeTick(Player me, World world, Game game, Move move) {
+
+        oldInfo.init(this.game, this.me, this.move, this.world, vehicleById);
+
         this.me = me;
         this.world = world;
         this.game = game;
-        this.moveMain = move;
+        this.move = move;
+
 
 
         for (Vehicle vehicle : world.getNewVehicles()) {
@@ -128,7 +134,7 @@ public final class MyStrategy implements Strategy {
             }
         }
 
-        info.init(game, me, move, world, vehicleById);
+        newInfo.init(game, me, move, world, vehicleById);
 
     }
 
@@ -143,20 +149,22 @@ public final class MyStrategy implements Strategy {
             return false;
         }
 
-        delayedMove.accept(moveMain);
+        delayedMove.accept(move);
         return true;
     }
 
 
     private void createFormation() {
 
-        double x = info.getX(VehicleType.FIGHTER);
-        double y = info.getY(VehicleType.FIGHTER);
+        double x = newInfo.getX(VehicleType.FIGHTER);
+        double y = newInfo.getY(VehicleType.FIGHTER);
 
         command().select(VehicleType.FIGHTER)
                 .move(x, 2D, y, 2D)
+                .sleep(5)
                 .then((oldInfo, newInfo) -> {
 
+                    System.out.println("Check ");
                     double oldX = oldInfo.getX(VehicleType.FIGHTER);
                     double oldY = oldInfo.getY(VehicleType.FIGHTER);
 
@@ -164,6 +172,7 @@ public final class MyStrategy implements Strategy {
                     double currentY = newInfo.getY(VehicleType.FIGHTER);
 
                     if (currentX == oldX && currentY == oldY) {
+                        System.out.println("SUCCUSS");
                         return true;
                     } else {
                         return false;
@@ -176,14 +185,13 @@ public final class MyStrategy implements Strategy {
     }
 
 
-    public ChainCommand command() {
-        return chainCommand;
+    public Command command() {
+        ChainCommand chainCommand = new ChainCommand(oldInfo, newInfo, delayedMoves);
+        commandMap.put(commandMap.size() + 1, chainCommand);
+        return chainCommand.createCommand();
     }
 
 
-    /**
-     * Основная логика нашей стратегии.
-     */
     private void move() {
         commandMap.entrySet().removeIf(entry -> {
             ChainCommand command = entry.getValue();

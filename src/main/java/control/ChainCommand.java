@@ -12,22 +12,34 @@ import java.util.function.Consumer;
 public class ChainCommand {
 
 
-    private Info info;
+    private Info oldInfo;
+    private Info newInfo;
     public Queue<Consumer<Move>> chainQueue;
 
     private Command command;
 
-    public ChainCommand(Info info,Queue<Consumer<Move>> chainQueue ) {
-        this.info = info;
+    public ChainCommand(Info oldInfo, Info newInfo, Queue<Consumer<Move>> chainQueue) {
+        this.oldInfo = oldInfo;
+        this.newInfo = newInfo;
         this.chainQueue = chainQueue;
     }
 
+
+    public Command createCommand(){
+        command = new Command(oldInfo, newInfo);
+        return command;
+    }
 
     
     public boolean execute(){
 
         if (command.condition()){
-            chainQueue.add(command.getMove());
+
+            Consumer<Move> move = command.getMove();
+            if (move != null){
+                chainQueue.add(move);
+            }
+
             command = command.nextCommand();
             return command == null;
         }else {
