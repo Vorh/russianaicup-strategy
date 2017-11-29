@@ -50,7 +50,7 @@ public class Command {
             move.setAction(ActionType.MOVE);
             move.setX(futureX);
             move.setY(futureY);
-            System.out.println("MOVE " + targetX + " " + targetY);
+            System.out.println("MOVE " + futureX + " " + futureY);
         };
 
         Condition cont = (oldInfo1, newInfo1) -> {

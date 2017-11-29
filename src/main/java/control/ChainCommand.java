@@ -1,6 +1,6 @@
 package control;
 
-import model.*;
+import model.Move;
 import model_custom.Info;
 
 import java.util.Queue;
@@ -16,7 +16,7 @@ public class ChainCommand {
     private Info newInfo;
     public Queue<Consumer<Move>> chainQueue;
 
-    private Command command;
+    private Com command;
 
     public ChainCommand(Info oldInfo, Info newInfo, Queue<Consumer<Move>> chainQueue) {
         this.oldInfo = oldInfo;
@@ -25,21 +25,20 @@ public class ChainCommand {
     }
 
 
-    public Command createCommand(){
-        command = new Command(oldInfo, newInfo);
+    public Com createCommand(){
+        command = new Start(oldInfo, newInfo);
         return command;
     }
 
     
     public boolean execute(){
 
-        if (command.condition()){
+        Consumer<Move> move = command.getMove();
+        if (move != null){
+            chainQueue.add(move);
+        }
 
-            Consumer<Move> move = command.getMove();
-            if (move != null){
-                chainQueue.add(move);
-            }
-
+        if (command.isComplete()){
             command = command.nextCommand();
             return command == null;
         }else {

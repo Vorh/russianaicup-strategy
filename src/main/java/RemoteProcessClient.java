@@ -32,6 +32,12 @@ public final class RemoteProcessClient implements Closeable {
     private final Map<Long, Facility> previousFacilityById = new HashMap<>();
 
     public RemoteProcessClient(String host, int port) throws IOException {
+
+        try {
+            Thread.sleep(700);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         socket = new Socket();
         socket.setSendBufferSize(BUFFER_SIZE_BYTES);
         socket.setReceiveBufferSize(BUFFER_SIZE_BYTES);

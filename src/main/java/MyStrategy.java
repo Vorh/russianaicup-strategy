@@ -1,5 +1,5 @@
 import control.ChainCommand;
-import control.Command;
+import control.Com;
 import model.*;
 import model_custom.Info;
 
@@ -50,26 +50,36 @@ public final class MyStrategy implements Strategy {
     protected final Info oldInfo;
     protected final Info newInfo;
     private int ticks;
+    protected double startX;
+    protected double startY;
+    protected boolean isComp = true;
 
 
     public MyStrategy() {
         oldInfo = new Info();
         newInfo = new Info();
         ticks = 20_000;
+
+
     }
 
 
     @Override
     public void move(Player me, World world, Game game, Move move) {
-
-
         initializeStrategy(world, game);
         initializeTick(me, world, game, move);
+
+
+//        example(move);
+
+
 
         if (!isCreateFormation) {
             createFormation();
             isCreateFormation = true;
         }
+
+
 
         if (me.getRemainingActionCooldownTicks() > 0) {
             return;
@@ -84,6 +94,53 @@ public final class MyStrategy implements Strategy {
         executeDelayedMove();
 
         ticks--;
+    }
+
+    private void example(Move move) {
+        if (!isCreateFormation){
+            delayedMoves.add(move1 -> {
+                move1.setAction(ActionType.CLEAR_AND_SELECT);
+                move.setRight(newInfo.getWorld().getWidth());
+                move.setBottom(newInfo.getWorld().getHeight());
+                move.setVehicleType(VehicleType.FIGHTER);
+            });
+
+            startX = newInfo.getX(VehicleType.FIGHTER);
+            startY = newInfo.getY(VehicleType.FIGHTER);
+
+
+            delayedMoves.add(move1 -> {
+                move1.setAction(ActionType.MOVE);
+                move1.setX(150);
+                move1.setY(0);
+                move1.setVehicleType(VehicleType.FIGHTER);
+            });
+            isCreateFormation = true;
+
+            System.out.println("Start x " + startX);
+            System.out.println("Start y " + startY);
+
+        }
+
+        double distanceTo = newInfo.getDistanceTo(150+ startX, 0+ startY, VehicleType.FIGHTER);
+
+        if (isComp &&distanceTo < 25){
+            delayedMoves.add(move1 -> {
+                move1.setAction(ActionType.MOVE);
+                move1.setX(0);
+                move1.setY(200);
+                move1.setVehicleType(VehicleType.FIGHTER);
+            });
+
+            System.out.println("COmp");
+            isComp = false;
+        }
+
+
+        double y = newInfo.getY(VehicleType.FIGHTER);
+        double x = newInfo.getX(VehicleType.FIGHTER);
+
+        System.out.println(distanceTo);
     }
 
     /**
@@ -155,18 +212,15 @@ public final class MyStrategy implements Strategy {
 
     private void createFormation() {
 
-        double x = newInfo.getX(VehicleType.FIGHTER);
-        double y = newInfo.getY(VehicleType.FIGHTER);
-
-        command().select(VehicleType.FIGHTER)
-                .move(x, 2D, y, 2D)
-                .scale(1.1D);
+        command().select(1024,1024,VehicleType.FIGHTER)
+                .move(150,0,VehicleType.FIGHTER)
+                .move(0,150,VehicleType.FIGHTER);
 
 
     }
 
 
-    public Command command() {
+    public Com command() {
         ChainCommand chainCommand = new ChainCommand(oldInfo, newInfo, delayedMoves);
         commandMap.put(commandMap.size() + 1, chainCommand);
         return chainCommand.createCommand();
