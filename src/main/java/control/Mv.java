@@ -10,33 +10,20 @@ import java.util.function.Consumer;
 /**
  * Created by vorh on 11/29/17.
  */
-public class Mv extends Com {
+public class Mv extends Command {
 
-    private double startX;
-    private double startY;
-    private VehicleType type;
+
+    private double x;
+    private double y;
 
     private double targetX;
     private double targetY;
 
     public Mv(double x, double y, VehicleType type, Info oldInfo, Info newInfo) {
         super(oldInfo, newInfo);
-
+        this.x = x;
+        this.y = y;
         this.type = type;
-
-        startX = newInfo.getX(type);
-        startY = newInfo.getY(type);
-
-        targetX = x+startX;
-        targetY = y+startY;
-
-        move = move -> {
-            move.setAction(ActionType.MOVE);
-            move.setVehicleType(type);
-            move.setX(x);
-            move.setY(y);
-        };
-
     }
 
     @Override
@@ -45,12 +32,25 @@ public class Mv extends Com {
     }
 
     @Override
-    public Com nextCommand() {
+    public Command nextCommand() {
         return super.nextCommand();
     }
 
     @Override
     public Consumer<Move> getMove() {
-        return super.getMove();
+
+        double startX = newInfo.getX(type);
+        double startY = newInfo.getY(type);
+
+        targetX = x + startX;
+        targetY = y + startY;
+
+        move = move -> {
+            move.setAction(ActionType.MOVE);
+            move.setVehicleType(type);
+            move.setX(x);
+            move.setY(y);
+        };
+        return move;
     }
 }

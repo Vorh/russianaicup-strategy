@@ -25,7 +25,7 @@ public class Info {
     }
 
     public double getX(VehicleType type) {
-        return streamVehicles(Ownership.ALLY, type).mapToDouble(Vehicle::getX).average().orElse(Double.NaN);
+        return streamVehicles(Ownership.ALLY, type).mapToDouble(Unit::getX).average().orElse(Double.NaN);
     }
 
     public double getY(VehicleType type) {

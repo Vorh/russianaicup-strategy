@@ -16,7 +16,8 @@ public class ChainCommand {
     private Info newInfo;
     public Queue<Consumer<Move>> chainQueue;
 
-    private Com command;
+    private Command command;
+    private Consumer<Move> currentMove;
 
     public ChainCommand(Info oldInfo, Info newInfo, Queue<Consumer<Move>> chainQueue) {
         this.oldInfo = oldInfo;
@@ -25,7 +26,7 @@ public class ChainCommand {
     }
 
 
-    public Com createCommand(){
+    public Command createCommand(){
         command = new Start(oldInfo, newInfo);
         return command;
     }
@@ -33,12 +34,13 @@ public class ChainCommand {
     
     public boolean execute(){
 
-        Consumer<Move> move = command.getMove();
-        if (move != null){
-            chainQueue.add(move);
+        if (currentMove == null){
+            currentMove = command.getMove();
+            if (currentMove !=null) chainQueue.add(currentMove);
         }
 
         if (command.isComplete()){
+            currentMove=null;
             command = command.nextCommand();
             return command == null;
         }else {

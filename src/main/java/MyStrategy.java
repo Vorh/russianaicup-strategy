@@ -1,5 +1,5 @@
 import control.ChainCommand;
-import control.Com;
+import control.Command;
 import model.*;
 import model_custom.Info;
 
@@ -212,15 +212,28 @@ public final class MyStrategy implements Strategy {
 
     private void createFormation() {
 
-        command().select(1024,1024,VehicleType.FIGHTER)
-                .move(150,0,VehicleType.FIGHTER)
-                .move(0,150,VehicleType.FIGHTER);
+
+        Vehicle vehicle = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).min(Comparator.comparingDouble(Unit::getX)).get();
+
+
+        Vehicle vehicle1 = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).max(Comparator.comparingDouble(Unit::getY)).get();
+
+
+        System.out.println(vehicle.getX());
+        System.out.println(vehicle1.getY());
+
+
+
+        command().select(vehicle.getX(),vehicle1.getY(),VehicleType.FIGHTER)
+                .move(150,0)
+//                .move(0,150)
+                .scale(1.15);
 
 
     }
 
 
-    public Com command() {
+    public Command command() {
         ChainCommand chainCommand = new ChainCommand(oldInfo, newInfo, delayedMoves);
         commandMap.put(commandMap.size() + 1, chainCommand);
         return chainCommand.createCommand();
