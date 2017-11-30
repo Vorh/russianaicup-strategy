@@ -213,18 +213,25 @@ public final class MyStrategy implements Strategy {
     private void createFormation() {
 
 
-        Vehicle vehicle = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).min(Comparator.comparingDouble(Unit::getX)).get();
+        double left = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).max(Comparator.comparingDouble(Unit::getY)).get().getY();
+
+        double top = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).min(Comparator.comparingDouble(Unit::getX)).get().getX();
+
+        double right = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).min(Comparator.comparingDouble(Unit::getY)).get().getY();
+
+        double bottom = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).max(Comparator.comparingDouble(Unit::getX)).get().getX();
+
+        System.out.println(top);
+        System.out.println(left);
+        System.out.println(right);
+        System.out.println(bottom);
 
 
-        Vehicle vehicle1 = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).max(Comparator.comparingDouble(Unit::getY)).get();
-
-
-        System.out.println(vehicle.getX());
-        System.out.println(vehicle1.getY());
 
 
 
-        command().select(vehicle.getX(),vehicle1.getY(),VehicleType.FIGHTER)
+
+        command().select(top,100,100,left,VehicleType.FIGHTER)
                 .move(150,0)
 //                .move(0,150)
                 .scale(1.15);

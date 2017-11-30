@@ -24,8 +24,8 @@ public abstract class Command {
         this.newInfo = newInfo;
     }
 
-    public Command select(double x , double y, VehicleType type){
-        Select select = new Select(x, y, type,oldInfo,newInfo);
+    public Command select(double top , double right,double bottom , double left, VehicleType type){
+        Select select = new Select(top, right,bottom,left, type,oldInfo,newInfo);
         next = select;
         this.type = type;
         return select;
