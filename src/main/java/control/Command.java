@@ -1,12 +1,11 @@
 package control;
 
 import model.Move;
-import model.Unit;
+import model.Vehicle;
 import model.VehicleType;
-import model_custom.Type;
+import model_custom.Formation;
 import model_custom.Info;
 
-import java.util.Comparator;
 import java.util.function.Consumer;
 
 /**
@@ -15,6 +14,7 @@ import java.util.function.Consumer;
 public abstract class Command {
 
 
+    private static int groupId;
     protected Info oldInfo;
     protected Info newInfo;
     protected VehicleType type;
@@ -28,70 +28,66 @@ public abstract class Command {
     }
 
 
-    public Command select(VehicleType type, Type formation){
-        double bottom = newInfo.streamVehicles(Info.Ownership.ALLY, type).max(Comparator.comparingDouble(Unit::getY)).get().getY();
+    public Select select(VehicleType type, Formation.Type formationType){
 
-        double left = newInfo.streamVehicles(Info.Ownership.ALLY, type).min(Comparator.comparingDouble(Unit::getX)).get().getX();
-
-        double top = newInfo.streamVehicles(Info.Ownership.ALLY, type).min(Comparator.comparingDouble(Unit::getY)).get().getY();
-
-        double right = newInfo.streamVehicles(Info.Ownership.ALLY, type).max(Comparator.comparingDouble(Unit::getX)).get().getX();
+        double bottom = newInfo.getBottom(type);
+        double left = newInfo.getLeft(type);
+        double top = newInfo.getTop(type);
+        double right = newInfo.getRight(type);
 
 
-        switch (formation){
+        switch (formationType){
             case CAURUS:
                 bottom = bottom-27;
                 right = right - 27;
                 break;
             case EUROBOREUS:
                 left = left + 27;
-                bottom = bottom + 27;
+                bottom = bottom - 27;
                 break;
             case MERIDIEM:
                 left = left + 27;
-                top = top - 27;
+                top = top + 27;
                 break;
             case MERIDIANAM:
                 right = right -27;
-                top = top - 27;
+                top = top + 27;
                 break;
         }
 
-        return select(top,right,bottom,left,type);
+
+        return select(top,right,bottom,left,type,formationType);
     }
 
-    public Command select(VehicleType type){
-        double bottom = newInfo.streamVehicles(Info.Ownership.ALLY, type).max(Comparator.comparingDouble(Unit::getY)).get().getY();
+    public Select select(double top ,
+                         double right,
+                         double bottom,
+                         double left,
+                         VehicleType type,
+                         Formation.Type formationType
+    ){
 
-        double left = newInfo.streamVehicles(Info.Ownership.ALLY, type).min(Comparator.comparingDouble(Unit::getX)).get().getX();
+         Vehicle[] vehicles = newInfo.streamVehicles(Info.Ownership.ALLY, type)
+                .filter(vehicle -> {
+                 return vehicle.getX()>= left &&
+                        vehicle.getX()<= right &&
+                        vehicle.getY()>= top &&
+                        vehicle.getY()<= bottom;
+                })
+                .toArray(Vehicle[]::new);
 
-        double top = newInfo.streamVehicles(Info.Ownership.ALLY, type).min(Comparator.comparingDouble(Unit::getY)).get().getY();
+        System.out.println("Select " + vehicles.length + " Type " + type.name());
+        groupId++;
 
-        double right = newInfo.streamVehicles(Info.Ownership.ALLY, type).max(Comparator.comparingDouble(Unit::getX)).get().getX();
-
-        return select(top,right,bottom,left,type);
-    }
-
-    public Command select(double top , double right,double bottom , double left, VehicleType type){
-        Select select = new Select(top, right,bottom,left, type,oldInfo,newInfo);
+        Formation formation = new Formation(vehicles,formationType,groupId,type);
+        Select select = new Select(top, right,bottom,left,oldInfo,newInfo,formation );
         next = select;
         this.type = type;
         return select;
     }
 
 
-    public Command move(double x , double y ){
-        Mv mv = new Mv(x, y,type,oldInfo,newInfo);
-        next = mv;
-        return mv;
-    }
 
-
-    public Command scale(double factor){
-        Scale scale = new Scale(factor,oldInfo,newInfo);
-        next = scale;
-        return scale;
-    }
 
     public boolean isComplete() {
         return true;

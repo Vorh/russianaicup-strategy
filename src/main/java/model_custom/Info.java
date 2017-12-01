@@ -2,6 +2,7 @@ package model_custom;
 
 import model.*;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -78,6 +79,23 @@ public class Info {
 
     public Stream<Vehicle> streamVehicles() {
         return streamVehicles(Ownership.ANY);
+    }
+
+
+    public double getBottom(VehicleType type){
+        return streamVehicles(Info.Ownership.ALLY, type).max(Comparator.comparingDouble(Unit::getY)).get().getY();
+    }
+
+    public double getLeft(VehicleType type) {
+        return streamVehicles(Info.Ownership.ALLY, type).min(Comparator.comparingDouble(Unit::getX)).get().getX();
+    }
+
+    public double getTop(VehicleType type) {
+        return streamVehicles(Info.Ownership.ALLY, type).min(Comparator.comparingDouble(Unit::getY)).get().getY();
+    }
+
+    public double getRight(VehicleType type) {
+        return streamVehicles(Info.Ownership.ALLY, type).max(Comparator.comparingDouble(Unit::getX)).get().getX();
     }
 
     public enum Ownership {

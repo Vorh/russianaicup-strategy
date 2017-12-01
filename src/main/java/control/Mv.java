@@ -1,10 +1,10 @@
 package control;
 
-import model.ActionType;
-import model.Move;
-import model.VehicleType;
+import model.*;
+import model_custom.Formation;
 import model_custom.Info;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 /**
@@ -15,15 +15,19 @@ public class Mv extends Command {
 
     private double x;
     private double y;
+    private final Vehicle[] vehicles;
+    private final Formation formation;
 
     private double targetX;
     private double targetY;
 
-    public Mv(double x, double y, VehicleType type, Info oldInfo, Info newInfo) {
+    public Mv(double x, double y, Info oldInfo, Info newInfo, Formation formation) {
         super(oldInfo, newInfo);
         this.x = x;
         this.y = y;
-        this.type = type;
+        this.vehicles = formation.getVehicles();
+        this.formation = formation;
+        this.type = formation.getVehicleType();
     }
 
     @Override
@@ -39,17 +43,17 @@ public class Mv extends Command {
     @Override
     public Consumer<Move> getMove() {
 
-        double startX = newInfo.getX(type);
-        double startY = newInfo.getY(type);
+        double startX = Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(0);
+        double startY = Arrays.stream(vehicles).mapToDouble(Unit::getY).average().orElse(0);
 
         targetX = x + startX;
         targetY = y + startY;
 
         move = move -> {
             move.setAction(ActionType.MOVE);
-            move.setVehicleType(type);
             move.setX(x);
             move.setY(y);
+            move.setGroup(formation.getGroupId());
         };
         return move;
     }

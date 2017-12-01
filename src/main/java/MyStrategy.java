@@ -1,7 +1,7 @@
 import control.ChainCommand;
 import control.Command;
 import model.*;
-import model_custom.Type;
+import model_custom.Formation;
 import model_custom.Info;
 
 import java.util.*;
@@ -214,36 +214,15 @@ public final class MyStrategy implements Strategy {
     private void createFormation() {
 
 
-        double bottom = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).max(Comparator.comparingDouble(Unit::getY)).get().getY();
-
-        double left = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).min(Comparator.comparingDouble(Unit::getX)).get().getX();
-
-        double top = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).min(Comparator.comparingDouble(Unit::getY)).get().getY();
-
-        double right = newInfo.streamVehicles(Info.Ownership.ALLY, VehicleType.FIGHTER).max(Comparator.comparingDouble(Unit::getX)).get().getX();
-
-//        top = top - 50D;
-        right = right + 54;
-//        bottom = bottom - 0;
-        left = left + 54;
-
-        System.out.println(top);
-        System.out.println(right);
-        System.out.println(bottom);
-        System.out.println(left);
-
-        command().select(VehicleType.FIGHTER)
-                .move(150,0)
-        .select(VehicleType.FIGHTER, Type.CAURUS)
-                .move(0,-30)
-        .select(VehicleType.FIGHTER, Type.EUROBOREUS)
-                .move(30,0)
-
-        .select(VehicleType.FIGHTER, Type.MERIDIEM)
-                .move(0,30)
-
-        .select(VehicleType.FIGHTER, Type.MERIDIANAM)
-                .move(-30,0);
+        command().select(VehicleType.FIGHTER, Formation.Type.MERIDIEM)
+                .move(0,30);
+        command().select(VehicleType.FIGHTER, Formation.Type.EUROBOREUS)
+                .move(30,0);
+//        .select(VehicleType.FIGHTER, Formation.Type.MERIDIEM)
+//                .move(0,30)
+//
+//        .select(VehicleType.FIGHTER, Formation.Type.MERIDIANAM)
+//                .move(-30,0);
 
     }
 
