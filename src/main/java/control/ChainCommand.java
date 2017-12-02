@@ -3,7 +3,6 @@ package control;
 import model.Move;
 import model_custom.Info;
 
-import java.util.Queue;
 import java.util.function.Consumer;
 
 /**
@@ -14,38 +13,56 @@ public class ChainCommand {
 
     private Info oldInfo;
     private Info newInfo;
-    public Queue<Consumer<Move>> chainQueue;
 
     private Command command;
-    private Consumer<Move> currentMove;
+    private Command previousCommand;
 
-    public ChainCommand(Info oldInfo, Info newInfo, Queue<Consumer<Move>> chainQueue) {
+    private boolean isComplete;
+
+    public ChainCommand(Info oldInfo, Info newInfo) {
         this.oldInfo = oldInfo;
         this.newInfo = newInfo;
-        this.chainQueue = chainQueue;
+        isComplete = false;
     }
 
 
     public Command createCommand(){
-        command = new Start(oldInfo, newInfo);
+        command = new Start(oldInfo,newInfo);
         return command;
     }
 
-    
-    public boolean execute(){
 
-        if (currentMove == null){
-            currentMove = command.getMove();
-            if (currentMove !=null) chainQueue.add(currentMove);
-        }
-
-        if (command.isComplete()){
-            currentMove=null;
-            command = command.nextCommand();
-            return command == null;
+    public boolean isNext(){
+        if (previousCommand != null){
+            return previousCommand.isComplete();
         }else {
-            return false;
+            return true;
         }
+    }
+
+    public boolean isComplete(){
+        return isComplete;
+    }
+
+    
+    public Consumer<Move> execute(){
+        if (previousCommand == null || previousCommand.isComplete()){
+            previousCommand = command;
+            command = previousCommand.nextCommand();
+
+            if (command == null){
+                isComplete = true;
+                return null;
+            }
+
+            Consumer<Move> move = command.getMove();
+            if (move == null) return execute();
+            return move;
+
+        }else {
+            return null;
+        }
+
     }
 
 }

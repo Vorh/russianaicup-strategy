@@ -20,6 +20,7 @@ public class Mv extends Command {
 
     private double targetX;
     private double targetY;
+    private double condition;
 
     public Mv(double x, double y, Info oldInfo, Info newInfo, Formation formation) {
         super(oldInfo, newInfo);
@@ -28,11 +29,14 @@ public class Mv extends Command {
         this.vehicles = formation.getVehicles();
         this.formation = formation;
         this.type = formation.getVehicleType();
+        condition =vehicles.length/2;
     }
 
     @Override
     public boolean isComplete() {
-        return newInfo.getDistanceTo(targetX, targetY, type) < 25;
+        boolean isComplete = newInfo.getDistanceTo(targetX, targetY, type) < 0;
+        System.out.println("Is complete " + isComplete + " group id " + formation.getGroupId());
+        return isComplete;
     }
 
     @Override
@@ -53,7 +57,6 @@ public class Mv extends Command {
             move.setAction(ActionType.MOVE);
             move.setX(x);
             move.setY(y);
-            move.setGroup(formation.getGroupId());
         };
         return move;
     }

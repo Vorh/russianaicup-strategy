@@ -71,10 +71,6 @@ public final class MyStrategy implements Strategy {
         initializeTick(me, world, game, move);
 
 
-//        example(move);
-
-
-
         if (!isCreateFormation) {
             createFormation();
             isCreateFormation = true;
@@ -97,52 +93,6 @@ public final class MyStrategy implements Strategy {
         ticks--;
     }
 
-    private void example(Move move) {
-        if (!isCreateFormation){
-            delayedMoves.add(move1 -> {
-                move1.setAction(ActionType.CLEAR_AND_SELECT);
-                move.setRight(newInfo.getWorld().getWidth());
-                move.setBottom(newInfo.getWorld().getHeight());
-                move.setVehicleType(VehicleType.FIGHTER);
-            });
-
-            startX = newInfo.getX(VehicleType.FIGHTER);
-            startY = newInfo.getY(VehicleType.FIGHTER);
-
-
-            delayedMoves.add(move1 -> {
-                move1.setAction(ActionType.MOVE);
-                move1.setX(150);
-                move1.setY(0);
-                move1.setVehicleType(VehicleType.FIGHTER);
-            });
-            isCreateFormation = true;
-
-            System.out.println("Start x " + startX);
-            System.out.println("Start y " + startY);
-
-        }
-
-        double distanceTo = newInfo.getDistanceTo(150+ startX, 0+ startY, VehicleType.FIGHTER);
-
-        if (isComp &&distanceTo < 25){
-            delayedMoves.add(move1 -> {
-                move1.setAction(ActionType.MOVE);
-                move1.setX(0);
-                move1.setY(200);
-                move1.setVehicleType(VehicleType.FIGHTER);
-            });
-
-            System.out.println("COmp");
-            isComp = false;
-        }
-
-
-        double y = newInfo.getY(VehicleType.FIGHTER);
-        double x = newInfo.getX(VehicleType.FIGHTER);
-
-        System.out.println(distanceTo);
-    }
 
     /**
      * Инциализируем стратегию.
@@ -213,22 +163,16 @@ public final class MyStrategy implements Strategy {
 
     private void createFormation() {
 
-
         command().select(VehicleType.FIGHTER, Formation.Type.MERIDIEM)
                 .move(0,30);
-        command().select(VehicleType.FIGHTER, Formation.Type.EUROBOREUS)
+        command().select(VehicleType.FIGHTER, Formation.Type.CAURUS)
                 .move(30,0);
-//        .select(VehicleType.FIGHTER, Formation.Type.MERIDIEM)
-//                .move(0,30)
-//
-//        .select(VehicleType.FIGHTER, Formation.Type.MERIDIANAM)
-//                .move(-30,0);
 
     }
 
 
     public Command command() {
-        ChainCommand chainCommand = new ChainCommand(oldInfo, newInfo, delayedMoves);
+        ChainCommand chainCommand = new ChainCommand(oldInfo, newInfo);
         commandMap.put(commandMap.size() + 1, chainCommand);
         return chainCommand.createCommand();
     }
@@ -237,7 +181,14 @@ public final class MyStrategy implements Strategy {
     private void move() {
         commandMap.entrySet().removeIf(entry -> {
             ChainCommand command = entry.getValue();
-            return command.execute();
+
+            if (command.isNext()){
+                delayedMoves.add(command.execute());
+            }
+
+            return command.isComplete();
+
+
         });
     }
 

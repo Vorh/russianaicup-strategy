@@ -56,6 +56,7 @@ public class Select extends Command {
             move.setLeft(left);
             move.setTop(top);
             move.setVehicleType(type);
+//            move.setGroup(formation.getGroupId());
         };
         return move;
     }

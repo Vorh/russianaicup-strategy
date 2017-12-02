@@ -17,4 +17,9 @@ public class Start extends Command {
     public Consumer<Move> getMove() {
         return move;
     }
+
+    @Override
+    public boolean isComplete() {
+        return true;
+    }
 }
