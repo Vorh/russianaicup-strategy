@@ -2,7 +2,7 @@ package control;
 
 import model.ActionType;
 import model.Move;
-import model.Vehicle;
+import model_custom.Formation;
 
 import java.util.function.Consumer;
 
@@ -13,24 +13,39 @@ public class Scale extends Command {
 
 
     private double factor;
+    private int time = 0;
 
-    public Scale(double factor,  Vehicle[] vehicles) {
+    public Scale(double factor, Formation formation) {
         this.factor = factor;
+        this.formation = formation;
+
+    }
+
+
+    @Override
+    public boolean isComplete() {
+        if (time == 15){
+            return true;
+        }else {
+            time++;
+            return false;
+        }
     }
 
     @Override
     public Consumer<Move> getMove() {
 
-        double x = newInfo.getX(type);
-        double y = newInfo.getY(type);
+        double left = newInfo.getLeft(formation.getVehicles());
+        double top = newInfo.getTop(formation.getVehicles());
 
+        double x = left + formation.getVehicles().length/2;
+        double y = top + formation.getVehicles().length/2;
 
         move = move ->{
             move.setAction(ActionType.SCALE);
             move.setX(x);
             move.setY(y);
             move.setFactor(factor);
-            move.setVehicleType(type);
         };
 
         return move;

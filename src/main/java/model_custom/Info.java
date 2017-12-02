@@ -26,6 +26,14 @@ public class Info {
         this.vehicleById = vehicleById;
     }
 
+    public double getX(Vehicle[] vehicles){
+        return Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(Double.NaN);
+    }
+
+    public double getY(Vehicle[] vehicles){
+        return Arrays.stream(vehicles).mapToDouble(Vehicle::getY).average().orElse(Double.NaN);
+    }
+
     public double getX(VehicleType type) {
         return streamVehicles(Ownership.ALLY, type).mapToDouble(Unit::getX).average().orElse(Double.NaN);
     }
@@ -91,17 +99,34 @@ public class Info {
         return streamVehicles(Info.Ownership.ALLY, type).max(Comparator.comparingDouble(Unit::getY)).get().getY();
     }
 
+    public double getBottom(Vehicle[] vehicles){
+        return Arrays.stream(vehicles).max(Comparator.comparingDouble(Unit::getY)).get().getY();
+    }
+
     public double getLeft(VehicleType type) {
         return streamVehicles(Info.Ownership.ALLY, type).min(Comparator.comparingDouble(Unit::getX)).get().getX();
+    }
+
+    public double getLeft(Vehicle[] vehicles){
+        return Arrays.stream(vehicles).min(Comparator.comparingDouble(Unit::getX)).get().getX();
     }
 
     public double getTop(VehicleType type) {
         return streamVehicles(Info.Ownership.ALLY, type).min(Comparator.comparingDouble(Unit::getY)).get().getY();
     }
+    public double getTop(Vehicle[] vehicles){
+        return Arrays.stream(vehicles).min(Comparator.comparingDouble(Unit::getY)).get().getY();
+    }
 
     public double getRight(VehicleType type) {
         return streamVehicles(Info.Ownership.ALLY, type).max(Comparator.comparingDouble(Unit::getX)).get().getX();
     }
+
+    public double getRight(Vehicle[] vehicles){
+        return Arrays.stream(vehicles).max(Comparator.comparingDouble(Unit::getX)).get().getX();
+    }
+
+
 
     public enum Ownership {
         ANY,

@@ -29,7 +29,7 @@ public class ChainCommand {
 
     public boolean isNext(){
         if (previousCommand != null && command != null){
-            return previousCommand.isComplete();
+            return previousCommand.isComplete() && command.isComplete();
         }else {
             return true;
         }

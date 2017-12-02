@@ -17,10 +17,9 @@ public class Select extends Command {
     private double right;
     private double bottom;
     private double left;
-    private Formation formation;
     private Vehicle[] vehicles;
 
-    public Select(double top, double right, double bottom, double left,  Formation formation) {
+    public Select(double top, double right, double bottom, double left, Formation formation) {
         this.top = top;
         this.right = right;
         this.bottom = bottom;
@@ -29,18 +28,8 @@ public class Select extends Command {
         this.vehicles = formation.getVehicles();
         this.type = formation.getVehicleType();
 
-
     }
 
-    public Select(Formation formation){
-
-    }
-
-    public Command scale(double factor){
-        Scale scale = new Scale(factor,vehicles);
-        next = scale;
-        return scale;
-    }
 
     @Override
     public Consumer<Move> getMove() {

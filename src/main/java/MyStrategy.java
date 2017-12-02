@@ -168,17 +168,19 @@ public final class MyStrategy implements Strategy {
             System.out.println("X " + facility.getLeft() + " Y " + facility.getTop());
         }
 
-
         command().select(VehicleType.ARRV, Formation.Type.MERIDIEM)
-                .capture(facilities[0])
-                .move();
-        command().select(VehicleType.ARRV, Formation.Type.MERIDIANAM)
-                .move();
+                .scale(0.5)
+                .move(250,250);
 
-        command().select(VehicleType.ARRV, Formation.Type.EUROBOREUS)
-                .move();
-        command().select(VehicleType.ARRV, Formation.Type.CAURUS)
-                .move();
+//                .capture(facilities[0])
+//                .move();
+//        command().select(VehicleType.ARRV, Formation.Type.MERIDIANAM)
+//                .move();
+//
+//        command().select(VehicleType.ARRV, Formation.Type.EUROBOREUS)
+//                .move();
+//        command().select(VehicleType.ARRV, Formation.Type.CAURUS)
+//                .move();
 
 
 //        command().select(VehicleType.FIGHTER, Formation.Type.MERIDIANAM)
@@ -207,6 +209,7 @@ public final class MyStrategy implements Strategy {
                 Consumer<Move> execute = chain.execute();
 
                 if (execute == null) return true;
+                System.out.println(execute.getClass());
                 delayedMoves.add(execute);
             }
 

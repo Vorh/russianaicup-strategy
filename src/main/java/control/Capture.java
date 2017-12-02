@@ -2,8 +2,6 @@ package control;
 
 import model.Facility;
 import model.Move;
-import model_custom.Formation;
-import model_custom.Info;
 
 import java.util.function.Consumer;
 
@@ -13,14 +11,14 @@ import java.util.function.Consumer;
 public class Capture extends Command{
 
     private final Facility facility;
-    protected final Mv mv;
+    protected Mv mv;
 
-    public Capture( Formation formation, Facility facility) {
+    public Capture( Facility facility) {
         this.facility = facility;
 
         double left = facility.getLeft();
         double top = facility.getTop();
-        mv = new Mv(left,top,formation);
+//        mv = new Mv(left,top);
     }
 
     @Override
@@ -31,7 +29,8 @@ public class Capture extends Command{
 
     @Override
     public Command nextCommand() {
-        Select select = new Select();
+//        Select select = new Select();
+        return null;
     }
 
     @Override

@@ -9,7 +9,7 @@ public final class Runner {
     public static void main(String[] args) throws IOException {
 
         try {
-            Thread.sleep(600);
+            Thread.sleep(800);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

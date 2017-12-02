@@ -21,6 +21,7 @@ public abstract class Command {
 
     protected Command next;
     protected Consumer<Move> move;
+    protected Formation formation;
 
 
     public static void setOldInfo(Info oldInfo) {
@@ -31,7 +32,7 @@ public abstract class Command {
         Command.newInfo = newInfo;
     }
 
-    public Select select(VehicleType type, Formation.Type formationType){
+    public Select select(VehicleType type, Formation.Type formationType) {
 
         double bottom = newInfo.getBottom(type);
         double left = newInfo.getLeft(type);
@@ -39,9 +40,9 @@ public abstract class Command {
         double right = newInfo.getRight(type);
 
 
-        switch (formationType){
+        switch (formationType) {
             case CAURUS:
-                bottom = bottom-27;
+                bottom = bottom - 27;
                 right = right - 27;
                 break;
             case EUROBOREUS:
@@ -53,47 +54,51 @@ public abstract class Command {
                 top = top + 27;
                 break;
             case MERIDIANAM:
-                right = right -27;
+                right = right - 27;
                 top = top + 27;
                 break;
         }
 
 
-        return select(top,right,bottom,left,type,formationType);
+        return select(top, right, bottom, left, type, formationType);
     }
 
-    public Select select(double top ,
+    public Select select(double top,
                          double right,
                          double bottom,
                          double left,
                          VehicleType type,
                          Formation.Type formationType
-    ){
+    ) {
 
-         Vehicle[] vehicles = newInfo.streamVehicles(Info.Ownership.ALLY, type)
+        Vehicle[] vehicles = newInfo.streamVehicles(Info.Ownership.ALLY, type)
                 .filter(vehicle -> {
-                 return vehicle.getX()>= left &&
-                        vehicle.getX()<= right &&
-                        vehicle.getY()>= top &&
-                        vehicle.getY()<= bottom;
+                    return vehicle.getX() >= left &&
+                            vehicle.getX() <= right &&
+                            vehicle.getY() >= top &&
+                            vehicle.getY() <= bottom;
                 })
                 .toArray(Vehicle[]::new);
 
         System.out.println("Select " + vehicles.length + " Type " + type.name());
 
-        Formation formation = new Formation(vehicles,formationType,0,type);
-        Select select = new Select(top, right,bottom,left,formation );
+        formation = new Formation(vehicles, formationType, 0, type);
+        Select select = new Select(top, right, bottom, left,formation);
         next = select;
         this.type = type;
         return select;
     }
-    public Command move(double x , double y ,Formation formation){
+    public Command move(double x , double y){
         Mv mv = new Mv(x, y,formation);
         next = mv;
         return mv;
     }
 
-
+    public Command scale(double factor){
+        Scale scale = new Scale(factor,formation);
+        next = scale;
+        return scale;
+    }
 
     public boolean isComplete() {
         return true;
@@ -105,8 +110,8 @@ public abstract class Command {
 
     public abstract Consumer<Move> getMove();
 
-    public Command capture(Facility facility){
+    public Command capture(Facility facility) {
 
-
+        return null;
     }
 }
