@@ -113,6 +113,7 @@ public final class MyStrategy implements Strategy {
     private void initializeTick(Player me, World world, Game game, Move move) {
 
         oldInfo.init(this.game, this.me, this.move, this.world, vehicleById);
+        Command.setOldInfo(oldInfo);
 
         this.me = me;
         this.world = world;
@@ -139,7 +140,7 @@ public final class MyStrategy implements Strategy {
         }
 
         newInfo.init(game, me, move, world, vehicleById);
-
+        Command.setNewInfo(newInfo);
     }
 
     /**
@@ -160,17 +161,39 @@ public final class MyStrategy implements Strategy {
 
     private void createFormation() {
 
-        command().select(VehicleType.FIGHTER, Formation.Type.MERIDIEM)
-                .move(0,30);
-        command().select(VehicleType.FIGHTER, Formation.Type.CAURUS)
-                .move(-30,0);
+
+        Facility[] facilities = newInfo.getWorld().getFacilities();
+
+        for (Facility facility : facilities) {
+            System.out.println("X " + facility.getLeft() + " Y " + facility.getTop());
+        }
+
+
+        command().select(VehicleType.ARRV, Formation.Type.MERIDIEM)
+                .capture(facilities[0])
+                .move();
+        command().select(VehicleType.ARRV, Formation.Type.MERIDIANAM)
+                .move();
+
+        command().select(VehicleType.ARRV, Formation.Type.EUROBOREUS)
+                .move();
+        command().select(VehicleType.ARRV, Formation.Type.CAURUS)
+                .move();
+
+
+//        command().select(VehicleType.FIGHTER, Formation.Type.MERIDIANAM)
+//                .move(300,100);
+//        command().select(VehicleType.FIGHTER, Formation.Type.EUROBOREUS)
+//                .move(150,400);
+
+
 
 
     }
 
 
     public Command command() {
-        ChainCommand chainCommand = new ChainCommand(oldInfo, newInfo);
+        ChainCommand chainCommand = new ChainCommand();
         commandMap.put(commandMap.size() + 1, chainCommand);
         return chainCommand.createCommand();
     }

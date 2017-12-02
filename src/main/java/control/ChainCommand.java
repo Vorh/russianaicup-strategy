@@ -1,7 +1,6 @@
 package control;
 
 import model.Move;
-import model_custom.Info;
 
 import java.util.function.Consumer;
 
@@ -11,23 +10,19 @@ import java.util.function.Consumer;
 public class ChainCommand {
 
 
-    private Info oldInfo;
-    private Info newInfo;
 
     private Command command;
     private Command previousCommand;
 
     private boolean isComplete;
 
-    public ChainCommand(Info oldInfo, Info newInfo) {
-        this.oldInfo = oldInfo;
-        this.newInfo = newInfo;
+    public ChainCommand() {
         isComplete = false;
     }
 
 
     public Command createCommand(){
-        command = new Start(oldInfo,newInfo);
+        command = new Start();
         return command;
     }
 
@@ -44,6 +39,9 @@ public class ChainCommand {
         return isComplete;
     }
 
+    public boolean isRepeat(){
+        return true;
+    }
     
     public Consumer<Move> execute(){
         if (previousCommand == null || previousCommand.isComplete()){

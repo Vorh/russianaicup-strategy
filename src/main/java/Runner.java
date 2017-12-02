@@ -7,11 +7,13 @@ public final class Runner {
     private final String token;
 
     public static void main(String[] args) throws IOException {
+
         try {
-            Thread.sleep(500);
+            Thread.sleep(600);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         new Runner(args.length == 3 ? args : new String[] {"127.0.0.1", "31001", "0000000000000000"}).run();
     }
 

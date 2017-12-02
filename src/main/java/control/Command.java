@@ -1,5 +1,6 @@
 package control;
 
+import model.Facility;
 import model.Move;
 import model.Vehicle;
 import model.VehicleType;
@@ -14,19 +15,21 @@ import java.util.function.Consumer;
 public abstract class Command {
 
 
-    private static int groupId;
-    protected Info oldInfo;
-    protected Info newInfo;
+    protected static Info oldInfo;
+    protected static Info newInfo;
     protected VehicleType type;
 
     protected Command next;
     protected Consumer<Move> move;
 
-    public Command(Info oldInfo, Info newInfo) {
-        this.oldInfo = oldInfo;
-        this.newInfo = newInfo;
+
+    public static void setOldInfo(Info oldInfo) {
+        Command.oldInfo = oldInfo;
     }
 
+    public static void setNewInfo(Info newInfo) {
+        Command.newInfo = newInfo;
+    }
 
     public Select select(VehicleType type, Formation.Type formationType){
 
@@ -77,15 +80,18 @@ public abstract class Command {
                 .toArray(Vehicle[]::new);
 
         System.out.println("Select " + vehicles.length + " Type " + type.name());
-        groupId++;
 
-        Formation formation = new Formation(vehicles,formationType,groupId,type);
-        Select select = new Select(top, right,bottom,left,oldInfo,newInfo,formation );
+        Formation formation = new Formation(vehicles,formationType,0,type);
+        Select select = new Select(top, right,bottom,left,formation );
         next = select;
         this.type = type;
         return select;
     }
-
+    public Command move(double x , double y ,Formation formation){
+        Mv mv = new Mv(x, y,formation);
+        next = mv;
+        return mv;
+    }
 
 
 
@@ -99,4 +105,8 @@ public abstract class Command {
 
     public abstract Consumer<Move> getMove();
 
+    public Command capture(Facility facility){
+
+
+    }
 }

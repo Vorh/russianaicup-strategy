@@ -4,7 +4,6 @@ import model.ActionType;
 import model.Move;
 import model.Vehicle;
 import model_custom.Formation;
-import model_custom.Info;
 
 import java.util.function.Consumer;
 
@@ -18,11 +17,10 @@ public class Select extends Command {
     private double right;
     private double bottom;
     private double left;
-    private final Formation formation;
+    private Formation formation;
     private Vehicle[] vehicles;
 
-    public Select(double top, double right, double bottom, double left, Info oldInfo, Info newInfo, Formation formation) {
-        super(oldInfo, newInfo);
+    public Select(double top, double right, double bottom, double left,  Formation formation) {
         this.top = top;
         this.right = right;
         this.bottom = bottom;
@@ -34,15 +32,12 @@ public class Select extends Command {
 
     }
 
-    public Command move(double x , double y ){
-        Mv mv = new Mv(x, y,oldInfo,newInfo,formation);
-        next = mv;
-        return mv;
+    public Select(Formation formation){
+
     }
 
-
     public Command scale(double factor){
-        Scale scale = new Scale(factor,oldInfo,newInfo,vehicles);
+        Scale scale = new Scale(factor,vehicles);
         next = scale;
         return scale;
     }

@@ -3,7 +3,6 @@ package control;
 import model.ActionType;
 import model.Move;
 import model.Vehicle;
-import model_custom.Info;
 
 import java.util.function.Consumer;
 
@@ -15,8 +14,7 @@ public class Scale extends Command {
 
     private double factor;
 
-    public Scale(double factor, Info oldInfo, Info newInfo, Vehicle[] vehicles) {
-        super(oldInfo, newInfo);
+    public Scale(double factor,  Vehicle[] vehicles) {
         this.factor = factor;
     }
 

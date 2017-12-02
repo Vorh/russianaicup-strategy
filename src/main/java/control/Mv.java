@@ -1,8 +1,10 @@
 package control;
 
-import model.*;
+import model.ActionType;
+import model.Move;
+import model.Unit;
+import model.Vehicle;
 import model_custom.Formation;
-import model_custom.Info;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -22,8 +24,7 @@ public class Mv extends Command {
     private double targetY;
     private double condition;
 
-    public Mv(double x, double y, Info oldInfo, Info newInfo, Formation formation) {
-        super(oldInfo, newInfo);
+    public Mv(double x, double y, Formation formation) {
         this.x = x;
         this.y = y;
         this.vehicles = formation.getVehicles();
@@ -34,7 +35,7 @@ public class Mv extends Command {
 
     @Override
     public boolean isComplete() {
-        boolean isComplete = newInfo.getDistanceTo(targetX, targetY, type) < 0;
+        boolean isComplete = newInfo.getDistanceTo(targetX, targetY, vehicles) < 0;
         System.out.println("Is complete " + isComplete + " group id " + formation.getGroupId());
         return isComplete;
     }
@@ -50,8 +51,10 @@ public class Mv extends Command {
         double startX = Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(0);
         double startY = Arrays.stream(vehicles).mapToDouble(Unit::getY).average().orElse(0);
 
-        targetX = x + startX;
-        targetY = y + startY;
+//        targetX = x + startX;
+//        targetY = y + startY;
+        x = x - startX;
+        y = y - startY;
 
         move = move -> {
             move.setAction(ActionType.MOVE);

@@ -2,6 +2,7 @@ package model_custom;
 
 import model.*;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -35,6 +36,10 @@ public class Info {
 
     public double getDistanceTo(double x , double y,VehicleType type){
         return streamVehicles(Ownership.ALLY,type).mapToDouble(vehicle -> vehicle.getDistanceTo(x, y)).average().orElse(Double.NaN);
+    }
+
+    public double getDistanceTo(double x , double y,Vehicle[] vehicles){
+        return Arrays.stream(vehicles).mapToDouble(vehicle -> vehicle.getDistanceTo(x, y)).average().orElse(Double.NaN);
     }
 
     public Player getMe() {
