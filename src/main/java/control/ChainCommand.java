@@ -33,7 +33,7 @@ public class ChainCommand {
 
 
     public boolean isNext(){
-        if (previousCommand != null){
+        if (previousCommand != null && command != null){
             return previousCommand.isComplete();
         }else {
             return true;

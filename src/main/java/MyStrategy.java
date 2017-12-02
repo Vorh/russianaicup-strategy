@@ -51,9 +51,6 @@ public final class MyStrategy implements Strategy {
     protected final Info oldInfo;
     protected final Info newInfo;
     private int ticks;
-    protected double startX;
-    protected double startY;
-    protected boolean isComp = true;
 
 
     public MyStrategy() {
@@ -166,7 +163,8 @@ public final class MyStrategy implements Strategy {
         command().select(VehicleType.FIGHTER, Formation.Type.MERIDIEM)
                 .move(0,30);
         command().select(VehicleType.FIGHTER, Formation.Type.CAURUS)
-                .move(30,0);
+                .move(-30,0);
+
 
     }
 
@@ -180,15 +178,16 @@ public final class MyStrategy implements Strategy {
 
     private void move() {
         commandMap.entrySet().removeIf(entry -> {
-            ChainCommand command = entry.getValue();
+            ChainCommand chain = entry.getValue();
 
-            if (command.isNext()){
-                delayedMoves.add(command.execute());
+            while (chain.isNext()){
+                Consumer<Move> execute = chain.execute();
+
+                if (execute == null) return true;
+                delayedMoves.add(execute);
             }
 
-            return command.isComplete();
-
-
+            return chain.isComplete();
         });
     }
 
