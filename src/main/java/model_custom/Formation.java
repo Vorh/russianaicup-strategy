@@ -28,6 +28,11 @@ public class Formation {
     }
 
     public enum Type {
+        FULL,
+        VERT_TOP,
+        VERT_BOT,
+        HOR_LEFT,
+        HOR_RIGHT,
         CAURUS,
         EUROBOREUS,
         MERIDIEM,

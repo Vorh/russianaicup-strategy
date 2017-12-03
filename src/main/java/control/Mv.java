@@ -20,30 +20,28 @@ public class Mv extends Command {
     private final Type typeCommand;
     private final Vehicle[] vehicles;
 
-    private double targetX;
-    private double targetY;
-    private double condition;
+    private int condition;
 
-    public Mv(double x, double y, Formation formation,Type typeCommand) {
+    public Mv(double x, double y, Formation formation, Type typeCommand) {
 
         this.x = x;
-        this. y = y;
+        this.y = y;
         this.typeCommand = typeCommand;
         this.formation = formation;
         this.vehicles = formation.getVehicles();
         this.type = formation.getVehicleType();
-        condition =vehicles.length*2;
 
-
-
-        System.out.println("Mv x " + x + " Y " + y + " Group " + formation.getGroupId());
     }
 
     @Override
     public boolean isComplete() {
-        boolean isComplete = newInfo.getDistanceTo(x, y, vehicles) < condition;
-//        System.out.println("Is complete " + isComplete + " group id " + formation.getGroupId());
-        return isComplete;
+
+        if (!newInfo.isMove(vehicles)) {
+            condition++;
+        }
+
+//        System.out.println("Is complete " + " group id " + formation.getGroupId());
+        return condition > 10;
     }
 
     @Override
@@ -53,12 +51,14 @@ public class Mv extends Command {
 
     @Override
     public Consumer<Move> getMove() {
+        System.out.println("Mv x " + x + " Y " + y + " Group " + formation.getGroupId());
 
-        if (typeCommand == Type.MAP){
-            double startX = Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(0);
-            double startY = Arrays.stream(vehicles).mapToDouble(Unit::getY).average().orElse(0);
+        double startX = Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(0);
+        double startY = Arrays.stream(vehicles).mapToDouble(Unit::getY).average().orElse(0);
+        if (typeCommand == Type.MAP) {
             x = x - startX;
             y = y - startY;
+
         }
 
         move = move -> {

@@ -76,6 +76,18 @@ public abstract class Command {
                 right = right - 27;
                 top = top + 27;
                 break;
+            case VERT_BOT:
+                top = top + 27;
+                break;
+            case VERT_TOP:
+                bottom = bottom -27;
+                break;
+            case HOR_LEFT:
+                right = right - 27;
+                break;
+            case HOR_RIGHT:
+                left = left + 27;
+                break;
         }
 
 

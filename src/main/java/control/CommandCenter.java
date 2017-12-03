@@ -129,6 +129,28 @@ public class CommandCenter {
         }
     }
 
+    public boolean isFreeStartPosition(int x , int y) {
+        return startPositions[x][y] == null;
+    }
+
+    public List<VehicleType> getRemotenessArmy() {
+        List<VehicleType> army = new ArrayList<>();
+
+        for (int i = startPositions.length-1; i > -1; i--) {
+            for (int j = startPositions[i].length-1; j > -1; j--) {
+                VehicleType type = startPositions[i][j];
+
+                if (type != null &&
+                    type != VehicleType.FIGHTER &&
+                    type != VehicleType.HELICOPTER){
+
+                    army.add(type);
+                }
+            }
+        }
+        return army;
+    }
+
     public enum Direction {
         NORTH,
         SOUTH,

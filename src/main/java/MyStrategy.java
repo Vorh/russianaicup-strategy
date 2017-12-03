@@ -114,7 +114,7 @@ public final class MyStrategy implements Strategy {
      */
     private void initializeTick(Player me, World world, Game game, Move move) {
 
-        oldInfo.init(this.game, this.me, this.move, this.world, vehicleById);
+        oldInfo.init(this.game, this.me, this.move, this.world, vehicleById, updateTickByVehicleId);
         Command.setOldInfo(oldInfo);
 
         this.me = me;
@@ -123,7 +123,7 @@ public final class MyStrategy implements Strategy {
         this.move = move;
 
 
-
+        updateTickByVehicleId.clear();
         for (Vehicle vehicle : world.getNewVehicles()) {
             vehicleById.put(vehicle.getId(), vehicle);
             updateTickByVehicleId.put(vehicle.getId(), world.getTickIndex());
@@ -141,7 +141,7 @@ public final class MyStrategy implements Strategy {
             }
         }
 
-        newInfo.init(game, me, move, world, vehicleById);
+        newInfo.init(game, me, move, world, vehicleById,updateTickByVehicleId);
         Command.setNewInfo(newInfo);
     }
 
@@ -196,13 +196,68 @@ public final class MyStrategy implements Strategy {
         command().select(fighterCaurus).moveRelatively(targetX,targetY);
     }
 
+    private void setStartTargetFighter(){
+
+        Formation fighterMeridiem = command().select(VehicleType.FIGHTER, Formation.Type.MERIDIEM)
+                .createFormation(commandCenter.getNextId());
+        Formation fighterCaurus = command().select(VehicleType.FIGHTER, Formation.Type.CAURUS)
+                .createFormation(commandCenter.getNextId());
+        Formation fighterEuroboreus = command().select(VehicleType.FIGHTER, Formation.Type.EUROBOREUS)
+                .createFormation(commandCenter.getNextId());
+        Formation fighterMeridianam = command().select(VehicleType.FIGHTER, Formation.Type.MERIDIANAM)
+                .createFormation(commandCenter.getNextId());
+
+        commandCenter.add(fighterCaurus);
+        commandCenter.add(fighterEuroboreus);
+        commandCenter.add(fighterMeridianam);
+        commandCenter.add(fighterMeridiem);
+
+        command().select(fighterEuroboreus).scale(0.1);
+        command().select(fighterMeridiem).scale(0.1);
+        command().select(fighterMeridianam).scale(0.1);
+        command().select(fighterCaurus).scale(0.1);
+
+        int targetX = 0;
+        int targetY = 0;
+
+        Pair<Integer, Integer> position = commandCenter.getStartPosition(VehicleType.FIGHTER);
+        if (commandCenter.pathFreeAir(CommandCenter.Direction.SOUTH, VehicleType.FIGHTER)) {
+            targetY = 200 - (position.key * 50);
+        }else {
+            targetX = 200 - (position.value * 50);
+        }
+        command().select(fighterMeridianam).moveRelatively(targetX,targetY);
+        command().select(fighterEuroboreus).moveRelatively(targetX,targetY);
+        command().select(fighterMeridiem).moveRelatively(targetX,targetY);
+        command().select(fighterCaurus).moveRelatively(targetX,targetY);
+    }
+
+
     private void createFormation() {
 
         commandCenter = new CommandCenter(oldInfo,newInfo);
 
-        setStartTargetHelicopter();
+//        setStartTargetHelicopter();
+//        setStartTargetFighter();
+        setStartTargetGroundForces();
 
     }
+
+    public void setStartTargetGroundForces(){
+
+        List<VehicleType> army = commandCenter.getRemotenessArmy();
+
+        VehicleType type;
+        type = army.get(0);
+
+
+        command().select(type, Formation.Type.FULL)
+                .move(250,250)
+                .scale(1.4);
+
+    }
+
+
 
 
     public Command command() {

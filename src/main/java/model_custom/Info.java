@@ -17,13 +17,15 @@ public class Info {
     private Game game;
     private Move moveMain;
     private Map<Long, Vehicle> vehicleById;
+    private Map<Long, Integer> updateTickByVehicleId;
 
-    public void init(Game game, Player me, Move move, World world,Map<Long,Vehicle> vehicleById) {
+    public void init(Game game, Player me, Move move, World world, Map<Long, Vehicle> vehicleById, Map<Long, Integer> updateTickByVehicleId) {
         this.me = me;
         this.world =  world;
         this.game = game;
         this.moveMain = move;
         this.vehicleById = vehicleById;
+        this.updateTickByVehicleId = updateTickByVehicleId;
     }
 
     public double getX(Vehicle[] vehicles){
@@ -40,6 +42,15 @@ public class Info {
 
     public double getY(VehicleType type) {
         return streamVehicles(Ownership.ALLY, type).mapToDouble(Vehicle::getY).average().orElse(Double.NaN);
+    }
+
+    public boolean isMove(Vehicle[] vehicles){
+        for (Vehicle vehicle : vehicles) {
+            if (updateTickByVehicleId.containsKey(vehicle.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public double getDistanceTo(double x , double y,VehicleType type){

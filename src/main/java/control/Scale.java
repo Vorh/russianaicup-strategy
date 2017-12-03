@@ -19,20 +19,6 @@ public class Scale extends Command {
         this.factor = factor;
         this.formation = formation;
 
-        double left = newInfo.getLeft(formation.getVehicles());
-        double top = newInfo.getTop(formation.getVehicles());
-
-        double x = left + formation.getVehicles().length/2;
-        double y = top + formation.getVehicles().length/2;
-
-        move = move ->{
-            move.setAction(ActionType.SCALE);
-            move.setX(x);
-            move.setY(y);
-            move.setFactor(factor);
-        };
-
-        System.out.println("Scale " + factor + " Group id " + formation.getGroupId());
     }
 
 
@@ -49,8 +35,21 @@ public class Scale extends Command {
     @Override
     public Consumer<Move> getMove() {
 
+        System.out.println("Scale " + factor + " Group id " + formation.getGroupId());
 
 
+        double left = newInfo.getLeft(formation.getVehicles());
+        double top = newInfo.getTop(formation.getVehicles());
+
+        double x = left + formation.getVehicles().length/2;
+        double y = top + formation.getVehicles().length/2;
+
+        move = move ->{
+            move.setAction(ActionType.SCALE);
+            move.setX(x);
+            move.setY(y);
+            move.setFactor(factor);
+        };
         return move;
     }
 }
