@@ -1,12 +1,12 @@
 import control.ChainCommand;
 import control.Command;
+import control.CommandCenter;
 import model.*;
 import model_custom.Formation;
 import model_custom.Info;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public final class MyStrategy implements Strategy {
 
@@ -52,7 +52,7 @@ public final class MyStrategy implements Strategy {
     protected final Info oldInfo;
     protected final Info newInfo;
     private int ticks;
-
+    protected CommandCenter commandCenter;
 
     public MyStrategy() {
         oldInfo = new Info();
@@ -159,39 +159,46 @@ public final class MyStrategy implements Strategy {
         return true;
     }
 
+    private void setStartTargetHelicopter(){
+
+        Formation fighterMeridiem = command().select(VehicleType.HELICOPTER, Formation.Type.MERIDIEM)
+                .createFormation(commandCenter.getNextId());
+        Formation fighterCaurus = command().select(VehicleType.HELICOPTER, Formation.Type.CAURUS)
+                .createFormation(commandCenter.getNextId());
+        Formation fighterEuroboreus = command().select(VehicleType.HELICOPTER, Formation.Type.EUROBOREUS)
+                .createFormation(commandCenter.getNextId());
+        Formation fighterMeridianam = command().select(VehicleType.HELICOPTER, Formation.Type.MERIDIANAM)
+                .createFormation(commandCenter.getNextId());
+
+        commandCenter.add(fighterCaurus);
+        commandCenter.add(fighterEuroboreus);
+        commandCenter.add(fighterMeridianam);
+        commandCenter.add(fighterMeridiem);
+
+        command().select(fighterEuroboreus).scale(0.1);
+        command().select(fighterMeridiem).scale(0.1);
+        command().select(fighterMeridianam).scale(0.1);
+        command().select(fighterCaurus).scale(0.1);
+
+        int ranger = 500;
+        if (commandCenter.pathFreeAir(CommandCenter.Direction.SOUTH, VehicleType.HELICOPTER)) {
+            command().select(fighterMeridianam).move(0,ranger);
+            command().select(fighterEuroboreus).move(0,ranger);
+            command().select(fighterMeridiem).move(0,ranger);
+            command().select(fighterCaurus).move(0,ranger);
+        }else {
+            command().select(fighterMeridianam).move(ranger,0);
+            command().select(fighterEuroboreus).move(ranger,0);
+            command().select(fighterMeridiem).move(ranger,0);
+            command().select(fighterCaurus).move(ranger,0);
+        }
+    }
 
     private void createFormation() {
 
+        commandCenter = new CommandCenter(oldInfo,newInfo);
 
-        Stream<Facility> facilityStream = Arrays.stream(newInfo.getWorld().getFacilities());
-
-
-        double heliLeft = newInfo.getLeft(VehicleType.HELICOPTER);
-        double heliTop = newInfo.getTop(VehicleType.HELICOPTER);
-
-        double fighterLeft= newInfo.getLeft(VehicleType.FIGHTER);
-        double fighterTop  = newInfo.getTop(VehicleType.FIGHTER);
-
-
-        System.out.println(world.getWidth());
-        System.out.println(world.getHeight());
-
-
-
-        Formation helicopterMeridianam = command().select(VehicleType.HELICOPTER,Formation.Type.MERIDIEM)
-                .createFormation(1);
-
-        Formation helicopterMeridiem = command().select(VehicleType.HELICOPTER, Formation.Type.MERIDIEM)
-                .createFormation(2);
-
-        command().select(helicopterMeridianam)
-                .scale(0.1);
-//                .move(600,400);
-
-        command().select(helicopterMeridianam)
-                .move(600,400);
-
-
+        setStartTargetHelicopter();
 
     }
 

@@ -22,7 +22,6 @@ public abstract class Command {
     protected Consumer<Move> move;
     protected Formation formation;
 
-
     public static void setOldInfo(Info oldInfo) {
         Command.oldInfo = oldInfo;
     }
