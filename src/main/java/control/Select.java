@@ -24,8 +24,6 @@ public class Select extends Command {
             move.setAction(ActionType.CLEAR_AND_SELECT);
             move.setGroup(formation.getGroupId());
         };
-
-        System.out.println("Select group " + formation.getGroupId() + " length " + formation.getVehicles().length);
     }
 
     public Select(double top, double right, double bottom, double left, Formation formation) {
@@ -46,14 +44,14 @@ public class Select extends Command {
             move.setVehicleType(type);
         };
 
-        System.out.println("Select " + formation.getVehicles().length + " Type " + type.name() + " formation type " + formation.getType());
-
     }
 
 
 
     @Override
     public Consumer<Move> getMove() {
+        System.out.println("Select group " + formation.getGroupId() + " length " + formation.getVehicles().length);
+
         return move;
     }
 }

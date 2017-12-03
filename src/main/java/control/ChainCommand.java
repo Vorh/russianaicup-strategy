@@ -44,13 +44,12 @@ public class ChainCommand {
         return isComplete && previousCommand.isComplete();
     }
 
-    public boolean isRepeat(){
-        return true;
-    }
-    
+
     public Consumer<Move> execute(){
         if (previousCommand == null || previousCommand.isComplete()){
             previousCommand = command;
+
+
             command = previousCommand.nextCommand();
 
             if (command == null){

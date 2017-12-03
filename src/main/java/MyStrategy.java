@@ -76,7 +76,6 @@ public final class MyStrategy implements Strategy {
         }
 
 
-
         if (me.getRemainingActionCooldownTicks() > 0) {
             return;
         }
@@ -141,7 +140,7 @@ public final class MyStrategy implements Strategy {
             }
         }
 
-        newInfo.init(game, me, move, world, vehicleById,updateTickByVehicleId);
+        newInfo.init(game, me, move, world, vehicleById, updateTickByVehicleId);
         Command.setNewInfo(newInfo);
     }
 
@@ -160,16 +159,16 @@ public final class MyStrategy implements Strategy {
         return true;
     }
 
-    private void setStartTargetHelicopter(){
+    private void setStartTargetHelicopter() {
 
         Formation fighterMeridiem = command().select(VehicleType.HELICOPTER, Formation.Type.MERIDIEM)
-                .createFormation(commandCenter.getNextId());
+                .createFormation();
         Formation fighterCaurus = command().select(VehicleType.HELICOPTER, Formation.Type.CAURUS)
-                .createFormation(commandCenter.getNextId());
+                .createFormation();
         Formation fighterEuroboreus = command().select(VehicleType.HELICOPTER, Formation.Type.EUROBOREUS)
-                .createFormation(commandCenter.getNextId());
+                .createFormation();
         Formation fighterMeridianam = command().select(VehicleType.HELICOPTER, Formation.Type.MERIDIANAM)
-                .createFormation(commandCenter.getNextId());
+                .createFormation();
 
         commandCenter.add(fighterCaurus);
         commandCenter.add(fighterEuroboreus);
@@ -187,25 +186,25 @@ public final class MyStrategy implements Strategy {
         Pair<Integer, Integer> position = commandCenter.getStartPosition(VehicleType.HELICOPTER);
         if (commandCenter.pathFreeAir(CommandCenter.Direction.SOUTH, VehicleType.HELICOPTER)) {
             targetY = 200 - (position.key * 50);
-        }else {
+        } else {
             targetX = 200 - (position.value * 50);
         }
-        command().select(fighterMeridianam).moveRelatively(targetX,targetY);
-        command().select(fighterEuroboreus).moveRelatively(targetX,targetY);
-        command().select(fighterMeridiem).moveRelatively(targetX,targetY);
-        command().select(fighterCaurus).moveRelatively(targetX,targetY);
+        command().select(fighterMeridianam).moveRelatively(targetX, targetY);
+        command().select(fighterEuroboreus).moveRelatively(targetX, targetY);
+        command().select(fighterMeridiem).moveRelatively(targetX, targetY);
+        command().select(fighterCaurus).moveRelatively(targetX, targetY);
     }
 
-    private void setStartTargetFighter(){
+    private void setStartTargetFighter() {
 
         Formation fighterMeridiem = command().select(VehicleType.FIGHTER, Formation.Type.MERIDIEM)
-                .createFormation(commandCenter.getNextId());
+                .createFormation();
         Formation fighterCaurus = command().select(VehicleType.FIGHTER, Formation.Type.CAURUS)
-                .createFormation(commandCenter.getNextId());
+                .createFormation();
         Formation fighterEuroboreus = command().select(VehicleType.FIGHTER, Formation.Type.EUROBOREUS)
-                .createFormation(commandCenter.getNextId());
+                .createFormation();
         Formation fighterMeridianam = command().select(VehicleType.FIGHTER, Formation.Type.MERIDIANAM)
-                .createFormation(commandCenter.getNextId());
+                .createFormation();
 
         commandCenter.add(fighterCaurus);
         commandCenter.add(fighterEuroboreus);
@@ -223,19 +222,20 @@ public final class MyStrategy implements Strategy {
         Pair<Integer, Integer> position = commandCenter.getStartPosition(VehicleType.FIGHTER);
         if (commandCenter.pathFreeAir(CommandCenter.Direction.SOUTH, VehicleType.FIGHTER)) {
             targetY = 200 - (position.key * 50);
-        }else {
+        } else {
             targetX = 200 - (position.value * 50);
         }
-        command().select(fighterMeridianam).moveRelatively(targetX,targetY);
-        command().select(fighterEuroboreus).moveRelatively(targetX,targetY);
-        command().select(fighterMeridiem).moveRelatively(targetX,targetY);
-        command().select(fighterCaurus).moveRelatively(targetX,targetY);
+        command().select(fighterMeridianam).moveRelatively(targetX, targetY);
+        command().select(fighterEuroboreus).moveRelatively(targetX, targetY);
+        command().select(fighterMeridiem).moveRelatively(targetX, targetY);
+        command().select(fighterCaurus).moveRelatively(targetX, targetY);
     }
 
 
     private void createFormation() {
 
-        commandCenter = new CommandCenter(oldInfo,newInfo);
+        commandCenter = new CommandCenter(oldInfo, newInfo);
+        Command.setCommandCenter(commandCenter);
 
 //        setStartTargetHelicopter();
 //        setStartTargetFighter();
@@ -243,7 +243,7 @@ public final class MyStrategy implements Strategy {
 
     }
 
-    public void setStartTargetGroundForces(){
+    public void setStartTargetGroundForces() {
 
         List<VehicleType> army = commandCenter.getRemotenessArmy();
 
@@ -251,13 +251,23 @@ public final class MyStrategy implements Strategy {
         type = army.get(0);
 
 
-        command().select(type, Formation.Type.FULL)
-                .move(250,250)
+        Formation allFirst = command().select(type, Formation.Type.FULL).createFormation();
+
+        command().select(allFirst)
+                .move(250, 250)
+                .then()
                 .scale(1.4);
 
+
+
+        VehicleType typeSecond = army.get(1);
+        Formation allSecond = command().select(typeSecond, Formation.Type.FULL).createFormation();
+        command().select(allSecond)
+                .move(250, 150)
+                .then()
+                .move(0,100);
+
     }
-
-
 
 
     public Command command() {
@@ -272,9 +282,7 @@ public final class MyStrategy implements Strategy {
         commandMap.entrySet().removeIf(entry -> {
             ChainCommand chain = entry.getValue();
 
-//            System.out.println(chain.getInfo());
-
-            while (chain.isNext()){
+            while (chain.isNext()) {
                 Consumer<Move> execute = chain.execute();
 
                 if (execute == null) return true;

@@ -22,6 +22,8 @@ public class Scale extends Command {
     }
 
 
+
+
     @Override
     public boolean isComplete() {
         if (time == 15){
@@ -38,11 +40,11 @@ public class Scale extends Command {
         System.out.println("Scale " + factor + " Group id " + formation.getGroupId());
 
 
-        double left = newInfo.getLeft(formation.getVehicles());
-        double top = newInfo.getTop(formation.getVehicles());
+        double left = newInfo.getX(formation.getVehicles());
+        double top = newInfo.getY(formation.getVehicles());
 
-        double x = left + formation.getVehicles().length/2;
-        double y = top + formation.getVehicles().length/2;
+        double x = left;
+        double y = top ;
 
         move = move ->{
             move.setAction(ActionType.SCALE);

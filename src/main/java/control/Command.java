@@ -21,6 +21,12 @@ public abstract class Command {
     protected Command next;
     protected Consumer<Move> move;
     protected Formation formation;
+    protected static CommandCenter commandCenter;
+
+
+    public static void setCommandCenter(CommandCenter commandCenter) {
+        Command.commandCenter = commandCenter;
+    }
 
     public static void setOldInfo(Info oldInfo) {
         Command.oldInfo = oldInfo;
@@ -39,9 +45,7 @@ public abstract class Command {
     }
 
 
-    public Formation createFormation(int groupId){
-        formation.setGroupId(groupId);
-
+    public Formation createFormation(){
         Assign assign = new Assign(formation);
         next = assign;
 
@@ -91,7 +95,7 @@ public abstract class Command {
         }
 
 
-        return select(top, right, bottom, left, type, formationType);
+        return select(top, right, bottom, left, type, formationType,commandCenter.getNextId());
     }
 
     public Select select(double top,
@@ -99,7 +103,8 @@ public abstract class Command {
                          double bottom,
                          double left,
                          VehicleType type,
-                         Formation.Type formationType
+                         Formation.Type formationType,
+                         int groupId
     ) {
 
         Vehicle[] vehicles = newInfo.streamVehicles(Info.Ownership.ALLY, type)
@@ -112,7 +117,7 @@ public abstract class Command {
                 .toArray(Vehicle[]::new);
 
 
-        formation = new Formation(vehicles, formationType, 0, type);
+        formation = new Formation(vehicles, formationType, groupId, type);
         Select select = new Select(top, right, bottom, left,formation);
         next = select;
         this.type = type;
@@ -159,4 +164,11 @@ public abstract class Command {
 
         return null;
     }
+
+    public  Command then(){
+        Select select = new Select(formation);
+        next = select;
+        return select;
+    }
+
 }
