@@ -180,17 +180,17 @@ public final class MyStrategy implements Strategy {
         command().select(fighterMeridianam).scale(0.1);
         command().select(fighterCaurus).scale(0.1);
 
-        int ranger = 500;
+        int ranger = 100;
         if (commandCenter.pathFreeAir(CommandCenter.Direction.SOUTH, VehicleType.HELICOPTER)) {
-            command().select(fighterMeridianam).move(0,ranger);
-            command().select(fighterEuroboreus).move(0,ranger);
-            command().select(fighterMeridiem).move(0,ranger);
-            command().select(fighterCaurus).move(0,ranger);
+            command().select(fighterMeridiem).move( 166,250);
+//            command().select(fighterEuroboreus).moveRelatively(0,ranger);
+//            command().select(fighterMeridiem).moveRelatively(0,ranger);
+//            command().select(fighterCaurus).moveRelatively(0,ranger);
         }else {
-            command().select(fighterMeridianam).move(ranger,0);
-            command().select(fighterEuroboreus).move(ranger,0);
-            command().select(fighterMeridiem).move(ranger,0);
-            command().select(fighterCaurus).move(ranger,0);
+//            command().select(fighterMeridianam).moveRelatively(ranger,0);
+//            command().select(fighterEuroboreus).moveRelatively(ranger,0);
+//            command().select(fighterMeridiem).moveRelatively(ranger,0);
+//            command().select(fighterCaurus).moveRelatively(ranger,0);
         }
     }
 

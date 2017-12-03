@@ -107,7 +107,13 @@ public abstract class Command {
         return select;
     }
     public Command move(double x , double y){
-        Mv mv = new Mv(x, y,formation);
+        Mv mv = new Mv(x, y,formation,Mv.Type.MAP);
+        next = mv;
+        return mv;
+    }
+
+    public Command moveRelatively(double x , double y){
+        Mv mv = new Mv(x, y,formation,Mv.Type.RELATIVE);
         next = mv;
         return mv;
     }

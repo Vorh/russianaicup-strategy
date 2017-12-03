@@ -17,32 +17,24 @@ public class Mv extends Command {
 
     private double x;
     private double y;
+    private final Type typeCommand;
     private final Vehicle[] vehicles;
 
     private double targetX;
     private double targetY;
     private double condition;
 
-    public Mv(double x, double y, Formation formation) {
+    public Mv(double x, double y, Formation formation,Type typeCommand) {
+
         this.x = x;
-        this.y = y;
+        this. y = y;
+        this.typeCommand = typeCommand;
         this.formation = formation;
         this.vehicles = formation.getVehicles();
         this.type = formation.getVehicleType();
         condition =vehicles.length*2;
 
 
-        double startX = Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(0);
-        double startY = Arrays.stream(vehicles).mapToDouble(Unit::getY).average().orElse(0);
-
-        this.x = x - startX;
-        this.y = y - startY;
-
-        move = move -> {
-            move.setAction(ActionType.MOVE);
-            move.setX(this.x);
-            move.setY(this.y);
-        };
 
         System.out.println("Mv x " + x + " Y " + y + " Group " + formation.getGroupId());
     }
@@ -61,6 +53,26 @@ public class Mv extends Command {
 
     @Override
     public Consumer<Move> getMove() {
+
+        if (typeCommand == Type.MAP){
+            double startX = Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(0);
+            double startY = Arrays.stream(vehicles).mapToDouble(Unit::getY).average().orElse(0);
+            x = x - startX;
+            y = y - startY;
+        }
+
+        move = move -> {
+            move.setAction(ActionType.MOVE);
+            move.setX(this.x);
+            move.setY(this.y);
+        };
+
         return move;
+    }
+
+
+    public enum Type {
+        RELATIVE,
+        MAP
     }
 }
