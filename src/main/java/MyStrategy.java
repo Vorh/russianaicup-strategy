@@ -4,6 +4,7 @@ import control.CommandCenter;
 import model.*;
 import model_custom.Formation;
 import model_custom.Info;
+import model_custom.Pair;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -180,18 +181,19 @@ public final class MyStrategy implements Strategy {
         command().select(fighterMeridianam).scale(0.1);
         command().select(fighterCaurus).scale(0.1);
 
-        int ranger = 100;
+        int targetX = 0;
+        int targetY = 0;
+
+        Pair<Integer, Integer> position = commandCenter.getStartPosition(VehicleType.HELICOPTER);
         if (commandCenter.pathFreeAir(CommandCenter.Direction.SOUTH, VehicleType.HELICOPTER)) {
-            command().select(fighterMeridiem).move( 166,250);
-//            command().select(fighterEuroboreus).moveRelatively(0,ranger);
-//            command().select(fighterMeridiem).moveRelatively(0,ranger);
-//            command().select(fighterCaurus).moveRelatively(0,ranger);
+            targetY = 200 - (position.key * 50);
         }else {
-//            command().select(fighterMeridianam).moveRelatively(ranger,0);
-//            command().select(fighterEuroboreus).moveRelatively(ranger,0);
-//            command().select(fighterMeridiem).moveRelatively(ranger,0);
-//            command().select(fighterCaurus).moveRelatively(ranger,0);
+            targetX = 200 - (position.value * 50);
         }
+        command().select(fighterMeridianam).moveRelatively(targetX,targetY);
+        command().select(fighterEuroboreus).moveRelatively(targetX,targetY);
+        command().select(fighterMeridiem).moveRelatively(targetX,targetY);
+        command().select(fighterCaurus).moveRelatively(targetX,targetY);
     }
 
     private void createFormation() {

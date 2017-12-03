@@ -88,7 +88,7 @@ public class CommandCenter {
         for (int i = 0; i < startPositions.length; i++) {
             for (int j = 0; j < startPositions[i].length; j++) {
                 if (startPositions[i][j] == type) {
-                    return new Pair<>(i, j);
+                    return new Pair<>(j, i);
                 }
             }
         }
