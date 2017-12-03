@@ -35,8 +35,13 @@ public class ChainCommand {
         }
     }
 
+    public String getInfo(){
+        return command.info();
+    }
+
+
     public boolean isComplete(){
-        return isComplete;
+        return isComplete && previousCommand.isComplete();
     }
 
     public boolean isRepeat(){

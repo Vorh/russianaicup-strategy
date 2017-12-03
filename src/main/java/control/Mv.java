@@ -29,13 +29,28 @@ public class Mv extends Command {
         this.formation = formation;
         this.vehicles = formation.getVehicles();
         this.type = formation.getVehicleType();
-        condition =vehicles.length/2;
+        condition =vehicles.length*2;
+
+
+        double startX = Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(0);
+        double startY = Arrays.stream(vehicles).mapToDouble(Unit::getY).average().orElse(0);
+
+        this.x = x - startX;
+        this.y = y - startY;
+
+        move = move -> {
+            move.setAction(ActionType.MOVE);
+            move.setX(this.x);
+            move.setY(this.y);
+        };
+
+        System.out.println("Mv x " + x + " Y " + y + " Group " + formation.getGroupId());
     }
 
     @Override
     public boolean isComplete() {
-        boolean isComplete = newInfo.getDistanceTo(x, y, vehicles) < 0;
-        System.out.println("Is complete " + isComplete + " group id " + formation.getGroupId());
+        boolean isComplete = newInfo.getDistanceTo(x, y, vehicles) < condition;
+//        System.out.println("Is complete " + isComplete + " group id " + formation.getGroupId());
         return isComplete;
     }
 
@@ -46,20 +61,6 @@ public class Mv extends Command {
 
     @Override
     public Consumer<Move> getMove() {
-
-        double startX = Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(0);
-        double startY = Arrays.stream(vehicles).mapToDouble(Unit::getY).average().orElse(0);
-
-//        targetX = x + startX;
-//        targetY = y + startY;
-        x = x - startX;
-        y = y - startY;
-
-        move = move -> {
-            move.setAction(ActionType.MOVE);
-            move.setX(x);
-            move.setY(y);
-        };
         return move;
     }
 }

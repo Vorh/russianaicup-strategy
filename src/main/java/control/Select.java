@@ -2,7 +2,6 @@ package control;
 
 import model.ActionType;
 import model.Move;
-import model.Vehicle;
 import model_custom.Formation;
 
 import java.util.function.Consumer;
@@ -17,7 +16,17 @@ public class Select extends Command {
     private double right;
     private double bottom;
     private double left;
-    private Vehicle[] vehicles;
+
+    public Select(Formation formation){
+        this.formation = formation;
+
+        move = move ->{
+            move.setAction(ActionType.CLEAR_AND_SELECT);
+            move.setGroup(formation.getGroupId());
+        };
+
+        System.out.println("Select group " + formation.getGroupId() + " length " + formation.getVehicles().length);
+    }
 
     public Select(double top, double right, double bottom, double left, Formation formation) {
         this.top = top;
@@ -25,14 +34,9 @@ public class Select extends Command {
         this.bottom = bottom;
         this.left = left;
         this.formation = formation;
-        this.vehicles = formation.getVehicles();
         this.type = formation.getVehicleType();
 
-    }
 
-
-    @Override
-    public Consumer<Move> getMove() {
         move = move -> {
             move.setAction(ActionType.CLEAR_AND_SELECT);
             move.setRight(right);
@@ -40,8 +44,16 @@ public class Select extends Command {
             move.setLeft(left);
             move.setTop(top);
             move.setVehicleType(type);
-//            move.setGroup(formation.getGroupId());
         };
+
+        System.out.println("Select " + formation.getVehicles().length + " Type " + type.name() + " formation type " + formation.getType());
+
+    }
+
+
+
+    @Override
+    public Consumer<Move> getMove() {
         return move;
     }
 }

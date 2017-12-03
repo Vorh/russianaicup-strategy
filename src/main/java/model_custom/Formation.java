@@ -23,6 +23,10 @@ public class Formation {
         this.vehicleType = vehicleType;
     }
 
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
     public enum Type {
         CAURUS,
         EUROBOREUS,

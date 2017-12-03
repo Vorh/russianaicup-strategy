@@ -14,7 +14,6 @@ import java.util.function.Consumer;
  */
 public abstract class Command {
 
-
     protected static Info oldInfo;
     protected static Info newInfo;
     protected VehicleType type;
@@ -31,6 +30,27 @@ public abstract class Command {
     public static void setNewInfo(Info newInfo) {
         Command.newInfo = newInfo;
     }
+
+    public Select select(Formation formation){
+        this.formation = formation;
+
+        Select select = new Select(formation);
+        next = select;
+        return select;
+    }
+
+
+    public Formation createFormation(int groupId){
+        formation.setGroupId(groupId);
+
+        Assign assign = new Assign(formation);
+        next = assign;
+
+
+
+        return formation;
+    }
+
 
     public Select select(VehicleType type, Formation.Type formationType) {
 
@@ -80,7 +100,6 @@ public abstract class Command {
                 })
                 .toArray(Vehicle[]::new);
 
-        System.out.println("Select " + vehicles.length + " Type " + type.name());
 
         formation = new Formation(vehicles, formationType, 0, type);
         Select select = new Select(top, right, bottom, left,formation);
@@ -100,6 +119,10 @@ public abstract class Command {
         return scale;
     }
 
+    public String info(){
+        return "Id " + formation.getGroupId() + " Type " + formation.getType() + " Vehicle type " + formation.getVehicleType();
+    }
+
     public boolean isComplete() {
         return true;
     }
@@ -109,6 +132,11 @@ public abstract class Command {
     }
 
     public abstract Consumer<Move> getMove();
+
+
+    public Formation build(){
+        return formation;
+    }
 
     public Command capture(Facility facility) {
 

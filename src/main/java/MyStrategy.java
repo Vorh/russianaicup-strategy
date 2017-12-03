@@ -6,6 +6,7 @@ import model_custom.Info;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public final class MyStrategy implements Strategy {
 
@@ -33,7 +34,7 @@ public final class MyStrategy implements Strategy {
     }
 
 
-    private Random random;
+    public Random random;
 
     private TerrainType[][] terrainTypeByCellXY;
     private WeatherType[][] weatherTypeByCellXY;
@@ -162,32 +163,33 @@ public final class MyStrategy implements Strategy {
     private void createFormation() {
 
 
-        Facility[] facilities = newInfo.getWorld().getFacilities();
-
-        for (Facility facility : facilities) {
-            System.out.println("X " + facility.getLeft() + " Y " + facility.getTop());
-        }
-
-        command().select(VehicleType.ARRV, Formation.Type.MERIDIEM)
-                .scale(0.5)
-                .move(250,250);
-
-//                .capture(facilities[0])
-//                .move();
-//        command().select(VehicleType.ARRV, Formation.Type.MERIDIANAM)
-//                .move();
-//
-//        command().select(VehicleType.ARRV, Formation.Type.EUROBOREUS)
-//                .move();
-//        command().select(VehicleType.ARRV, Formation.Type.CAURUS)
-//                .move();
+        Stream<Facility> facilityStream = Arrays.stream(newInfo.getWorld().getFacilities());
 
 
-//        command().select(VehicleType.FIGHTER, Formation.Type.MERIDIANAM)
-//                .move(300,100);
-//        command().select(VehicleType.FIGHTER, Formation.Type.EUROBOREUS)
-//                .move(150,400);
+        double heliLeft = newInfo.getLeft(VehicleType.HELICOPTER);
+        double heliTop = newInfo.getTop(VehicleType.HELICOPTER);
 
+        double fighterLeft= newInfo.getLeft(VehicleType.FIGHTER);
+        double fighterTop  = newInfo.getTop(VehicleType.FIGHTER);
+
+
+        System.out.println(world.getWidth());
+        System.out.println(world.getHeight());
+
+
+
+        Formation helicopterMeridianam = command().select(VehicleType.HELICOPTER,Formation.Type.MERIDIEM)
+                .createFormation(1);
+
+        Formation helicopterMeridiem = command().select(VehicleType.HELICOPTER, Formation.Type.MERIDIEM)
+                .createFormation(2);
+
+        command().select(helicopterMeridianam)
+                .scale(0.1);
+//                .move(600,400);
+
+        command().select(helicopterMeridianam)
+                .move(600,400);
 
 
 
@@ -202,8 +204,11 @@ public final class MyStrategy implements Strategy {
 
 
     private void move() {
+
         commandMap.entrySet().removeIf(entry -> {
             ChainCommand chain = entry.getValue();
+
+//            System.out.println(chain.getInfo());
 
             while (chain.isNext()){
                 Consumer<Move> execute = chain.execute();
