@@ -13,7 +13,7 @@ public class Scale extends Command {
 
 
     private double factor;
-    private int time = 0;
+    private int condition = 0;
 
     public Scale(double factor, Formation formation) {
         this.factor = factor;
@@ -26,12 +26,12 @@ public class Scale extends Command {
 
     @Override
     public boolean isComplete() {
-        if (time == 15){
-            return true;
-        }else {
-            time++;
-            return false;
+        if (!newInfo.isMove(formation.getVehicles())) {
+            condition++;
         }
+
+//        System.out.println("Is complete " + " group id " + formation.getGroupId());
+        return condition > 10;
     }
 
     @Override
@@ -40,11 +40,8 @@ public class Scale extends Command {
         System.out.println("Scale " + factor + " Group id " + formation.getGroupId());
 
 
-        double left = newInfo.getX(formation.getVehicles());
-        double top = newInfo.getY(formation.getVehicles());
-
-        double x = left;
-        double y = top ;
+        double x = newInfo.getX(formation.getGroupId());
+        double y = newInfo.getY(formation.getGroupId());
 
         move = move ->{
             move.setAction(ActionType.SCALE);

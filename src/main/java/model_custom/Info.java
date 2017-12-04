@@ -28,12 +28,12 @@ public class Info {
         this.updateTickByVehicleId = updateTickByVehicleId;
     }
 
-    public double getX(Vehicle[] vehicles){
-        return Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(Double.NaN);
+    public double getX(int groupId){
+        return streamVehicles(groupId).mapToDouble(Unit::getX).average().orElse(Double.NaN);
     }
 
-    public double getY(Vehicle[] vehicles){
-        return Arrays.stream(vehicles).mapToDouble(Vehicle::getY).average().orElse(Double.NaN);
+    public double getY(int groupId){
+        return streamVehicles(groupId).mapToDouble(Vehicle::getY).average().orElse(Double.NaN);
     }
 
     public double getX(VehicleType type) {
@@ -77,6 +77,19 @@ public class Info {
         return moveMain;
     }
 
+
+    public Stream<Vehicle> streamVehicles(int groupId){
+        Stream<Vehicle> stream = vehicleById.values().stream();
+
+        return stream.filter(vehicle -> {
+            for (int i : vehicle.getGroups()) {
+                if (i==groupId){
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
     public Stream<Vehicle> streamVehicles(Ownership ownership, VehicleType vehicleType) {
         Stream<Vehicle> stream = vehicleById.values().stream();
 

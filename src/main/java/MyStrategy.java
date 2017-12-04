@@ -253,19 +253,25 @@ public final class MyStrategy implements Strategy {
 
         Formation allFirst = command().select(type, Formation.Type.FULL).createFormation();
 
-        command().select(allFirst)
-                .move(250, 250)
-                .then()
-                .scale(1.4);
+        command().select(allFirst);
+//                .move(250, 250)
+//                .then()
+//                .scale(1.6);
 
 
 
         VehicleType typeSecond = army.get(1);
         Formation allSecond = command().select(typeSecond, Formation.Type.FULL).createFormation();
         command().select(allSecond)
-                .move(250, 150)
+                .moveRelatively(100, 0)
                 .then()
-                .move(0,100);
+                .scale(1.4)
+                .then()
+                .scale(0.1)
+                .then()
+                .scale(1.4)
+                .then()
+                .scale(1);
 
     }
 
