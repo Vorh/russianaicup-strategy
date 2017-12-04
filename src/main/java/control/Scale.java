@@ -4,6 +4,7 @@ import model.ActionType;
 import model.Move;
 import model_custom.Formation;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -16,11 +17,11 @@ public class Scale extends Command {
     private int condition = 0;
 
     public Scale(double factor, Formation formation) {
+        super(formation);
         this.factor = factor;
         this.formation = formation;
 
     }
-
 
 
 
@@ -35,7 +36,7 @@ public class Scale extends Command {
     }
 
     @Override
-    public Consumer<Move> getMove() {
+    public List<Consumer<Move>> getMoves() {
 
         System.out.println("Scale " + factor + " Group id " + formation.getGroupId());
 
@@ -43,12 +44,13 @@ public class Scale extends Command {
         double x = newInfo.getX(formation.getGroupId());
         double y = newInfo.getY(formation.getGroupId());
 
-        move = move ->{
+        moves.add(getSelectMove());
+        moves.add(move ->{
             move.setAction(ActionType.SCALE);
             move.setX(x);
             move.setY(y);
             move.setFactor(factor);
-        };
-        return move;
+        });
+        return moves;
     }
 }

@@ -4,21 +4,23 @@ import model.ActionType;
 import model.Move;
 import model_custom.Formation;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
  * Created by vorh on 11/29/17.
  */
-public class Select extends Command {
+public class CreateGroup extends Command {
 
 
     private double top;
     private double right;
     private double bottom;
     private double left;
+    private Consumer<Move> move;
 
-    public Select(Formation formation){
-        this.formation = formation;
+    public CreateGroup(Formation formation){
+        super(formation);
 
         move = move ->{
             move.setAction(ActionType.CLEAR_AND_SELECT);
@@ -26,14 +28,12 @@ public class Select extends Command {
         };
     }
 
-    public Select(double top, double right, double bottom, double left, Formation formation) {
+    public CreateGroup(double top, double right, double bottom, double left, Formation formation) {
+        super(formation);
         this.top = top;
         this.right = right;
         this.bottom = bottom;
         this.left = left;
-        this.formation = formation;
-        this.type = formation.getVehicleType();
-
 
         move = move -> {
             move.setAction(ActionType.CLEAR_AND_SELECT);
@@ -41,7 +41,7 @@ public class Select extends Command {
             move.setBottom(bottom);
             move.setLeft(left);
             move.setTop(top);
-            move.setVehicleType(type);
+            move.setVehicleType(formation.getVehicleType());
         };
 
     }
@@ -49,9 +49,13 @@ public class Select extends Command {
 
 
     @Override
-    public Consumer<Move> getMove() {
-        System.out.println("Select group " + formation.getGroupId() + " length " + formation.getVehicles().length);
+    public List<Consumer<Move>> getMoves() {
+        moves.add(move);
+        moves.add(move ->{
+            move.setAction(ActionType.ASSIGN);
+            move.setGroup(formation.getGroupId());
+        });
 
-        return move;
+        return moves;
     }
 }

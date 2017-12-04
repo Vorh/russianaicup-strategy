@@ -1,7 +1,9 @@
 package control;
 
 import model.Move;
+import model_custom.Formation;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -15,14 +17,15 @@ public class ChainCommand {
     private Command previousCommand;
 
     private boolean isComplete;
+    private boolean isAtomic;
 
     public ChainCommand() {
         isComplete = false;
     }
 
 
-    public Command createCommand(){
-        command = new Start();
+    public Command createCommand(Formation formation){
+        command = new Command(formation);
         return command;
     }
 
@@ -35,9 +38,7 @@ public class ChainCommand {
         }
     }
 
-    public String getInfo(){
-        return command.info();
-    }
+
 
 
     public boolean isComplete(){
@@ -45,7 +46,7 @@ public class ChainCommand {
     }
 
 
-    public Consumer<Move> execute(){
+    public List<Consumer<Move>> execute(){
         if (previousCommand == null || previousCommand.isComplete()){
             previousCommand = command;
 
@@ -57,9 +58,9 @@ public class ChainCommand {
                 return null;
             }
 
-            Consumer<Move> move = command.getMove();
-            if (move == null) return execute();
-            return move;
+            List<Consumer<Move>> moves = command.getMoves();
+            if (moves == null) return execute();
+            return moves;
 
         }else {
             return null;

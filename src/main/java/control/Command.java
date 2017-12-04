@@ -1,61 +1,41 @@
 package control;
 
-import model.Facility;
-import model.Move;
-import model.Vehicle;
-import model.VehicleType;
+import model.*;
 import model_custom.Formation;
 import model_custom.Info;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
  * Created by vorh on 11/29/17.
  */
-public abstract class Command {
+public class Command {
 
     protected static Info oldInfo;
     protected static Info newInfo;
-    protected VehicleType type;
 
     protected Command next;
-    protected Consumer<Move> move;
+    protected List<Consumer<Move>> moves= new ArrayList<>();
     protected Formation formation;
     protected static CommandCenter commandCenter;
 
 
-    public static void setCommandCenter(CommandCenter commandCenter) {
-        Command.commandCenter = commandCenter;
-    }
-
-    public static void setOldInfo(Info oldInfo) {
-        Command.oldInfo = oldInfo;
-    }
-
-    public static void setNewInfo(Info newInfo) {
-        Command.newInfo = newInfo;
-    }
-
-    public Select select(Formation formation){
+    public Command(Formation formation) {
         this.formation = formation;
-
-        Select select = new Select(formation);
-        next = select;
-        return select;
     }
 
 
-    public Formation createFormation(){
-        Assign assign = new Assign(formation);
-        next = assign;
+    public Formation createFormation(VehicleType type,Formation.Type formationType){
 
-
+        select(type, formationType);
 
         return formation;
     }
 
 
-    public Select select(VehicleType type, Formation.Type formationType) {
+    public CreateGroup select(VehicleType type, Formation.Type formationType) {
 
         double bottom = newInfo.getBottom(type);
         double left = newInfo.getLeft(type);
@@ -98,13 +78,13 @@ public abstract class Command {
         return select(top, right, bottom, left, type, formationType,commandCenter.getNextId());
     }
 
-    public Select select(double top,
-                         double right,
-                         double bottom,
-                         double left,
-                         VehicleType type,
-                         Formation.Type formationType,
-                         int groupId
+    public CreateGroup select(double top,
+                              double right,
+                              double bottom,
+                              double left,
+                              VehicleType type,
+                              Formation.Type formationType,
+                              int groupId
     ) {
 
         Vehicle[] vehicles = newInfo.streamVehicles(Info.Ownership.ALLY, type)
@@ -118,10 +98,9 @@ public abstract class Command {
 
 
         formation = new Formation(vehicles, formationType, groupId, type);
-        Select select = new Select(top, right, bottom, left,formation);
-        next = select;
-        this.type = type;
-        return select;
+        CreateGroup createGroup = new CreateGroup(top, right, bottom, left,formation);
+        next = createGroup;
+        return createGroup;
     }
     public Command move(double x , double y){
         Mv mv = new Mv(x, y,formation,Mv.Type.MAP);
@@ -141,9 +120,14 @@ public abstract class Command {
         return scale;
     }
 
-    public String info(){
-        return "Id " + formation.getGroupId() + " Type " + formation.getType() + " Vehicle type " + formation.getVehicleType();
+
+    public Consumer<Move> getSelectMove(){
+        return move -> {
+          move.setAction(ActionType.CLEAR_AND_SELECT);
+          move.setGroup(formation.getGroupId());
+        };
     }
+
 
     public boolean isComplete() {
         return true;
@@ -153,22 +137,21 @@ public abstract class Command {
         return next;
     }
 
-    public abstract Consumer<Move> getMove();
-
-
-    public Formation build(){
-        return formation;
+    public List<Consumer<Move>> getMoves(){
+        return moves;
     }
 
-    public Command capture(Facility facility) {
 
-        return null;
+
+    public static void setCommandCenter(CommandCenter commandCenter) {
+        Command.commandCenter = commandCenter;
     }
 
-    public  Command then(){
-        Select select = new Select(formation);
-        next = select;
-        return select;
+    public static void setOldInfo(Info oldInfo) {
+        Command.oldInfo = oldInfo;
     }
 
+    public static void setNewInfo(Info newInfo) {
+        Command.newInfo = newInfo;
+    }
 }

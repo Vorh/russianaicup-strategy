@@ -19,6 +19,7 @@ public class CommandCenter {
     private int groupIdCounter = 1;
 
     private VehicleType startPositions[][] = new VehicleType[3][3];
+    private VehicleType centerStartPosition;
 
     public CommandCenter(Info oldInfo, Info newInfo) {
         this.oldInfo = oldInfo;
@@ -149,6 +150,10 @@ public class CommandCenter {
             }
         }
         return army;
+    }
+
+    public VehicleType[][] getStartPositions() {
+        return startPositions;
     }
 
     public enum Direction {

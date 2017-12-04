@@ -7,6 +7,7 @@ import model.Vehicle;
 import model_custom.Formation;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -23,13 +24,12 @@ public class Mv extends Command {
     private int condition;
 
     public Mv(double x, double y, Formation formation, Type typeCommand) {
-
+        super(formation);
         this.x = x;
         this.y = y;
         this.typeCommand = typeCommand;
         this.formation = formation;
         this.vehicles = formation.getVehicles();
-        this.type = formation.getVehicleType();
 
     }
 
@@ -50,7 +50,7 @@ public class Mv extends Command {
     }
 
     @Override
-    public Consumer<Move> getMove() {
+    public List<Consumer<Move>> getMoves() {
         System.out.println("Mv x " + x + " Y " + y + " Group " + formation.getGroupId());
 
         double startX = Arrays.stream(vehicles).mapToDouble(Unit::getX).average().orElse(0);
@@ -61,13 +61,14 @@ public class Mv extends Command {
 
         }
 
-        move = move -> {
+        moves.add(getSelectMove());
+        moves.add(move -> {
             move.setAction(ActionType.MOVE);
             move.setX(this.x);
             move.setY(this.y);
-        };
+        });
 
-        return move;
+        return moves;
     }
 
 
