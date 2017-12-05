@@ -20,6 +20,7 @@ public class Command {
     protected List<Consumer<Move>> moves= new ArrayList<>();
     protected Formation formation;
     protected static CommandCenter commandCenter;
+    private Then then;
 
 
     public Command(Formation formation) {
@@ -121,6 +122,11 @@ public class Command {
     }
 
 
+    public Command then(Then then){
+        this.then = then;
+        return this;
+    }
+
     public Consumer<Move> getSelectMove(){
         return move -> {
           move.setAction(ActionType.CLEAR_AND_SELECT);
@@ -141,6 +147,16 @@ public class Command {
         return moves;
     }
 
+    public void executeThen() {
+        if (then != null){
+            then.event();
+        }
+    }
+
+
+    public interface Then{
+        void event();
+    }
 
 
     public static void setCommandCenter(CommandCenter commandCenter) {

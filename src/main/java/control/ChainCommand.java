@@ -47,7 +47,9 @@ public class ChainCommand {
 
 
     public List<Consumer<Move>> execute(){
+
         if (previousCommand == null || previousCommand.isComplete()){
+
             previousCommand = command;
 
 

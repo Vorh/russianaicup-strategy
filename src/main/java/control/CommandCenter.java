@@ -28,7 +28,11 @@ public class CommandCenter {
 
 
         for (VehicleType vehicleType : VehicleType.values()) {
-            identifyPosition(vehicleType);
+
+            if (vehicleType!=VehicleType.FIGHTER && vehicleType != VehicleType.HELICOPTER){
+                identifyPosition(vehicleType);
+            }
+
         }
 
         displayStartPositions();
@@ -39,8 +43,8 @@ public class CommandCenter {
             System.out.println();
             for (int j = 0; j < startPositions[i].length; j++) {
 
-                VehicleType vehicleType = startPositions[j][i];
-                if (vehicleType == null) {
+                VehicleType vehicleType = startPositions[i][j];
+                if (vehicleType == null || vehicleType == VehicleType.FIGHTER || vehicleType == VehicleType.HELICOPTER) {
                     System.out.print(" |  NULL | ");
                 } else {
                     System.out.print(" | " + vehicleType.name() + " | ");
@@ -58,7 +62,7 @@ public class CommandCenter {
 
         if (left == 166.0) {
             if (top == 18.0) {
-                startPositions[2][0] = vehicleType;
+                startPositions[0][2] = vehicleType;
             } else if (top == 92.0) {
                 startPositions[2][1] = vehicleType;
             } else {
@@ -66,19 +70,19 @@ public class CommandCenter {
             }
         } else if (left == 92.0) {
             if (top == 18.0) {
-                startPositions[1][0] = vehicleType;
+                startPositions[0][1] = vehicleType;
             } else if (top == 92.0) {
                 startPositions[1][1] = vehicleType;
             } else {
-                startPositions[1][2] = vehicleType;
+                startPositions[2][0] = vehicleType;
             }
         } else {
             if (top == 18.0) {
                 startPositions[0][0] = vehicleType;
             } else if (top == 92.0) {
-                startPositions[0][1] = vehicleType;
+                startPositions[1][0] = vehicleType;
             } else {
-                startPositions[0][2] = vehicleType;
+                startPositions[2][0] = vehicleType;
             }
         }
 
@@ -139,7 +143,7 @@ public class CommandCenter {
 
         for (int i = startPositions.length-1; i > -1; i--) {
             for (int j = startPositions[i].length-1; j > -1; j--) {
-                VehicleType type = startPositions[i][j];
+                VehicleType type = startPositions[j][i];
 
                 if (type != null &&
                     type != VehicleType.FIGHTER &&

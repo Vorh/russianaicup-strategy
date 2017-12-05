@@ -53,6 +53,13 @@ public final class MyStrategy implements Strategy {
     protected final Info newInfo;
     private int ticks;
     protected CommandCenter commandCenter;
+    protected int lenght;
+    protected Formation center;
+    protected Formation left;
+    protected Formation right;
+    protected boolean isLeft;
+    protected boolean isCenter;
+    protected boolean isRight;
 
     public MyStrategy() {
         oldInfo = new Info();
@@ -242,19 +249,291 @@ public final class MyStrategy implements Strategy {
 
     }
 
+
     public void setStartTargetGroundForces() {
 
 
-        Formation formation = command().createFormation(VehicleType.ARRV, Formation.Type.FULL);
-        command(formation)
-                .moveRelatively(100,0)
-                .scale(1.6);
+        VehicleType[][] startPositions = commandCenter.getStartPositions();
 
-        Formation two = command().createFormation(VehicleType.TANK, Formation.Type.FULL);
-        command(two)
-                .moveRelatively(100,0)
-                .scale(1.6);
+        isLeft = false;
+        isCenter = false;
+        isRight = false;
 
+
+        lenght = 74;
+
+
+        secondRowLeft(startPositions);
+        secondRowCenter(startPositions);
+        secondRowRight(startPositions);
+
+        firstRowCenter(startPositions);
+        firstRowLeft(startPositions);
+        firstRowRight(startPositions);
+
+
+
+        thirdRowLeft(startPositions);
+        thirdRowLeft(startPositions);
+        thirdRowRight(startPositions);
+    }
+
+    private void thirdRowRight(VehicleType[][] startPositions) {
+
+        VehicleType type;
+        if (startPositions[2][2]!=null){
+
+            if (startPositions[1][2]==null && isRight ){
+
+                isRight = false;
+                type = startPositions[2][2];
+                right = command().createFormation(type, Formation.Type.FULL);
+                command(right).moveRelatively(0,-lenght);
+            }else if (startPositions[1][1]==null){
+
+                if (startPositions[2][1]!=null){
+                    isLeft = false;
+                    thirdRowCenter(startPositions);
+
+                    type = startPositions[2][2];
+                    left = command().createFormation(type, Formation.Type.FULL);
+                    command(left).moveRelatively(-lenght*2,0)
+                            .moveRelatively(0,-lenght);
+                }else {
+                    isCenter =false;
+                    type = startPositions[2][2];
+                    center = command().createFormation(type, Formation.Type.FULL);
+                    command(center).moveRelatively(-lenght,0)
+                            .moveRelatively(0,-lenght);
+                }
+            }else {
+                isLeft = false;
+                type = startPositions[2][2];
+                left = command().createFormation(type, Formation.Type.FULL);
+                command(left).moveRelatively(-lenght*2,0)
+                        .moveRelatively(0,-lenght);
+            }
+
+        }
+    }
+
+    private void thirdRowLeft(VehicleType[][] startPositions) {
+
+        VehicleType type;
+
+
+        if (startPositions[2][0] != null) {
+
+            if (startPositions[1][0] == null && isLeft) {
+                type = startPositions[2][0];
+                isLeft = false;
+                left = command().createFormation(type, Formation.Type.FULL);
+                command(left).moveRelatively(0, -lenght);
+            } else if (startPositions[1][1] == null) {
+
+                if (startPositions[2][1] != null) {
+                    isRight = false;
+                    thirdRowCenter(startPositions);
+
+                    type = startPositions[2][0];
+                    right = command().createFormation(type, Formation.Type.FULL);
+                    command(right).moveRelatively(lenght * 2, 0)
+                            .moveRelatively(0, -lenght);
+                } else {
+                    isCenter= false;
+                    type = startPositions[2][0];
+                    center = command().createFormation(type, Formation.Type.FULL);
+                    command(center).moveRelatively(lenght, 0)
+                            .moveRelatively(0, -lenght);
+                }
+
+            } else {
+                isRight =false;
+                type = startPositions[2][0];
+                right = command().createFormation(type, Formation.Type.FULL);
+                command(right).moveRelatively(lenght * 2, 0)
+                        .moveRelatively(0, -lenght);
+            }
+
+
+        }
+    }
+
+    private void thirdRowCenter(VehicleType[][] startPositions) {
+
+        VehicleType type;
+        if (startPositions[2][1]!=null){
+            if (startPositions[1][1]==null && isCenter){
+                isCenter =false;
+                type = startPositions[2][1];
+
+                center = command().createFormation(type, Formation.Type.FULL);
+                command(center).moveRelatively(0,-lenght);
+            }else if (startPositions[1][0]==null){
+
+                if (startPositions[2][0]!=null){
+                    isRight =false;
+                    firstRowLeft(startPositions);
+
+                    type = startPositions[2][1];
+                    right= command().createFormation(type, Formation.Type.FULL);
+                    command(right).moveRelatively(lenght,0)
+                            .moveRelatively(0,-lenght);
+                }else {
+                    isLeft =false;
+                    type = startPositions[2][1];
+                    left = command().createFormation(type, Formation.Type.FULL);
+                    command(left).moveRelatively(0,-lenght);
+                }
+            }else {
+                isRight= false;
+                type = startPositions[2][1];
+                right = command().createFormation(type, Formation.Type.FULL);
+                command(right).moveRelatively(lenght,0)
+                        .moveRelatively(0,-lenght);
+            }
+
+        }
+
+    }
+
+    private void secondRowRight(VehicleType[][] startPosition) {
+        VehicleType type;
+        if (startPosition[1][2] != null) {
+            isRight = false;
+            type = startPosition[1][2];
+            right = command().createFormation(type, Formation.Type.FULL);
+        }
+    }
+
+    private void secondRowCenter(VehicleType[][] startPosition) {
+        VehicleType type;
+        if (startPosition[1][1] != null) {
+
+            isCenter=false;
+            type = startPosition[1][1];
+            center = command().createFormation(type, Formation.Type.FULL);
+        }
+    }
+
+    private void secondRowLeft(VehicleType[][] startPosition) {
+        VehicleType type;
+        if (startPosition[1][0] != null) {
+            isLeft = false;
+            type = startPosition[1][0];
+            left = command().createFormation(type, Formation.Type.FULL);
+        }
+    }
+
+    private void firstRowRight(VehicleType[][] startPositions) {
+        VehicleType type;
+        Formation right;
+        Formation center;
+        if (startPositions[0][2] != null) {
+
+            if (startPositions[1][2] == null) {
+                type = startPositions[0][2];
+                isRight = false;
+                right = command().createFormation(type, Formation.Type.FULL);
+                command(right).moveRelatively(0, lenght);
+            } else if (startPositions[1][1] == null) {
+
+                if (startPositions[0][1] != null) {
+                    firstRowCenter(startPositions);
+                } else {
+
+                    isCenter=false;
+                    type = startPositions[0][2];
+                    center = command().createFormation(type, Formation.Type.FULL);
+                    command(center).moveRelatively(-lenght, 0)
+                            .moveRelatively(0, lenght);
+                }
+
+            } else {
+                isRight = false;
+                type = startPositions[0][2];
+                right = command().createFormation(type, Formation.Type.FULL);
+                command(right).moveRelatively(-lenght * 2, 0)
+                        .moveRelatively(0, lenght);
+            }
+        }
+    }
+
+    private void firstRowLeft(VehicleType[][] startPositions) {
+        VehicleType type;
+        Formation left;
+        Formation right;
+        if (startPositions[0][0] != null) {
+            if (startPositions[1][0] == null) {
+
+                isLeft = false;
+                type = startPositions[0][0];
+                left = command().createFormation(type, Formation.Type.FULL);
+                command(left).moveRelatively(0, lenght);
+                System.out.println("Left to y");
+            } else if (startPositions[1][1] == null) {
+
+                if (startPositions[0][1] != null) {
+                    isRight = false;
+                    firstRowCenter(startPositions);
+
+                    type = startPositions[0][0];
+                    right = command().createFormation(type, Formation.Type.FULL);
+                    command(right).moveRelatively(lenght * 2, 0)
+                            .moveRelatively(0, lenght);
+                } else {
+
+                    isRight =true;
+                    type = startPositions[0][0];
+                    right = command().createFormation(type, Formation.Type.FULL);
+                    command(right).moveRelatively(lenght, 0)
+                            .moveRelatively(0, lenght);
+                }
+
+            }
+
+
+        }
+    }
+
+    private void firstRowCenter(VehicleType[][] startPositions) {
+        VehicleType type;
+        Formation center;
+        Formation left;
+        Formation right;
+        if (startPositions[0][1] != null) {
+            if (startPositions[1][1] == null && isCenter) {
+                isCenter =false;
+                type = startPositions[0][1];
+                center = command().createFormation(type, Formation.Type.FULL);
+                command(center).moveRelatively(0, lenght);
+            } else if (startPositions[1][0] == null) {
+
+                if (startPositions[0][0] == null) {
+                    isLeft =true;
+
+                    type = startPositions[0][1];
+
+                    left = command().createFormation(type, Formation.Type.FULL);
+                    command(left).moveRelatively(-lenght, 0)
+                            .moveRelatively(0, lenght);
+                } else {
+                    isRight = false;
+                    firstRowLeft(startPositions);
+
+                    type = startPositions[0][1];
+                    right = command().createFormation(type, Formation.Type.FULL);
+                    command(right).moveRelatively(lenght, 0)
+                            .moveRelatively(0, lenght);
+                }
+            } else {
+                isRight =true;
+                type = startPositions[0][1];
+                right = command().createFormation(type, Formation.Type.FULL);
+                command(right).moveRelatively(lenght, 0)
+                        .moveRelatively(0, lenght);
+            }
+        }
     }
 
 
